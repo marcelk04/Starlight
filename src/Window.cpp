@@ -1,5 +1,7 @@
 #include "Window.hpp"
 
+#include <stdexcept>
+
 namespace stl {
 
 Window::Window(int width, int height, const std::string& name)
@@ -14,6 +16,12 @@ Window::~Window() {
 
 bool Window::shouldClose() const {
 	return glfwWindowShouldClose(m_Window);
+}
+
+void Window::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) {
+	if (glfwCreateWindowSurface(instance, m_Window, nullptr, surface) != VK_SUCCESS) {
+		throw std::runtime_error("Failed to create window surface!");
+	}
 }
 
 void Window::initWindow() {

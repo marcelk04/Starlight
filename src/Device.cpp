@@ -256,7 +256,7 @@ void Device::setupDebugMessenger() {
 }
 
 void Device::createSurface() {
-	window.createWindowSurface(instance, &m_Surface);
+	m_Window.createWindowSurface(m_Instance, &m_Surface);
 }
 
 void Device::pickPhysicalDevice() {
@@ -293,7 +293,7 @@ void Device::createLogicalDevice() {
 	QueueFamilyIndices indices = findQueueFamilies(m_PhysicalDevice);
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };
+	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
 
 	float queuePriority = 1.0f;
 
