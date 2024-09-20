@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Window.hpp"
+#include "Pipeline.hpp"
 
 namespace stl {
 
@@ -14,6 +15,7 @@ public:
 
 private:
 	Window m_Window{ WIDTH, HEIGHT, "Starlight" };
+	Pipeline m_Pipeline{ "shaders/SimpleShader.vert.spv", "shaders/SimpleShader.frag.spv" };
 };
 
 }

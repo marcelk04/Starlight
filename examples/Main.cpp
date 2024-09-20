@@ -4,7 +4,11 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <filesystem>
+
 int main() {
+    std::filesystem::current_path(PROJ_DIR);
+
     stl::FirstApp app;
 
     try {

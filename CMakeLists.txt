@@ -16,6 +16,8 @@ file(GLOB SRC_FILES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 find_package(Vulkan REQUIRED)
 
+add_compile_definitions(PROJ_DIR="${PROJECT_SOURCE_DIR}")
+
 add_executable(Main "examples/Main.cpp" ${SRC_FILES})
 
 target_link_libraries(Main Vulkan::Vulkan glfw)
