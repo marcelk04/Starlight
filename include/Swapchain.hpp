@@ -6,12 +6,14 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace stl {
 
 class Swapchain {
 public:
 	Swapchain(Device& device, VkExtent2D windowExtent);
+	Swapchain(Device& device, VkExtent2D windowExtent, std::shared_ptr<Swapchain> previousSwapchain);
 	~Swapchain();
 
 	Swapchain(const Swapchain&) = delete;
@@ -32,6 +34,7 @@ public:
 	VkResult submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);
 
 private:
+	void init();
 	void createSwapchain();
 	void createImageViews();
 	void createDepthResources();
@@ -63,6 +66,7 @@ private:
 	VkExtent2D m_WindowExtent;
 
 	VkSwapchainKHR m_Swapchain;
+	std::shared_ptr<Swapchain> m_OldSwapchain;
 
 	std::vector<VkSemaphore> m_ImageAvailableSemaphores;
 	std::vector<VkSemaphore> m_RenderFinishedSemaphores;

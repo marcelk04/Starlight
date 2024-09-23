@@ -26,7 +26,10 @@ private:
 	void createPipelineLayout();
 	void createPipeline();
 	void createCommandBuffers();
+	void freeCommandBuffers();
 	void drawFrame();
+	void recreateSwapchain();
+	void recordCommandBuffer(int imageIndex);
 
 public:
 	static constexpr int WIDTH = 800;
@@ -35,7 +38,7 @@ public:
 private:
 	Window m_Window{ WIDTH, HEIGHT, "Starlight" };
 	Device m_Device{ m_Window };
-	Swapchain m_Swapchain{ m_Device, m_Window.getExtent() };
+	std::unique_ptr<Swapchain> m_Swapchain;
 	std::unique_ptr<Pipeline> m_Pipeline;
 	VkPipelineLayout m_PipelineLayout;
 	std::vector<VkCommandBuffer> m_CommandBuffers;

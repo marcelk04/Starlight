@@ -12,12 +12,14 @@ namespace stl {
 
 Swapchain::Swapchain(Device& device, VkExtent2D windowExtent)
 	: m_Device{ device }, m_WindowExtent{ windowExtent } {
-	createSwapchain();
-	createImageViews();
-	createRenderPass();
-	createDepthResources();
-	createFramebuffers();
-	createSyncObjects();
+	init();
+}
+
+Swapchain::Swapchain(Device& device, VkExtent2D windowExtent, std::shared_ptr<Swapchain> previousSwapchain)
+	: m_Device{ device }, m_WindowExtent{ windowExtent }, m_OldSwapchain{ previousSwapchain } {
+	init();
+
+	m_OldSwapchain = nullptr;
 }
 
 Swapchain::~Swapchain() {
@@ -109,6 +111,15 @@ VkResult Swapchain::submitCommandBuffers(const VkCommandBuffer* buffers, uint32_
 	return result;
 }
 
+void Swapchain::init() {
+	createSwapchain();
+	createImageViews();
+	createRenderPass();
+	createDepthResources();
+	createFramebuffers();
+	createSyncObjects();
+}
+
 void Swapchain::createSwapchain() {
 	SwapchainSupportDetails swapchainSupport = m_Device.getSwapchainSupport();
 
@@ -148,7 +159,7 @@ void Swapchain::createSwapchain() {
 	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	createInfo.presentMode = presentMode;
 	createInfo.clipped = VK_TRUE;
-	createInfo.oldSwapchain = VK_NULL_HANDLE;
+	createInfo.oldSwapchain = m_OldSwapchain == nullptr ? VK_NULL_HANDLE : m_OldSwapchain->m_Swapchain;
 
 	if (vkCreateSwapchainKHR(m_Device.getDevice(), &createInfo, nullptr, &m_Swapchain) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to create swapchain!");
@@ -333,7 +344,7 @@ void Swapchain::createSyncObjects() {
 
 VkSurfaceFormatKHR Swapchain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const {
 	for (const auto& availableFormat : availableFormats) {
-		if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
 			return availableFormat;
 		}
 	}
