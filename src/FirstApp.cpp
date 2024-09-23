@@ -6,6 +6,7 @@
 namespace stl {
 
 FirstApp::FirstApp() {
+	loadModels();
 	createPipelineLayout();
 	createPipeline();
 	createCommandBuffers();
@@ -22,6 +23,16 @@ void FirstApp::run() {
 	}
 
 	vkDeviceWaitIdle(m_Device.getDevice());
+}
+
+void FirstApp::loadModels() {
+	std::vector<Model::Vertex> vertices = {
+		{{ 0.0f, -0.5f }},
+		{{ 0.5f, 0.5f }},
+		{{ -0.5f, 0.5f }}
+	};
+
+	m_Model = std::make_unique<Model>(m_Device, vertices);
 }
 
 void FirstApp::createPipelineLayout() {
@@ -83,8 +94,8 @@ void FirstApp::createCommandBuffers() {
 		vkCmdBeginRenderPass(m_CommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 		m_Pipeline->bind(m_CommandBuffers[i]);
-
-		vkCmdDraw(m_CommandBuffers[i], 3, 1, 0, 0);
+		m_Model->bind(m_CommandBuffers[i]);
+		m_Model->draw(m_CommandBuffers[i]);
 
 		vkCmdEndRenderPass(m_CommandBuffers[i]);
 
