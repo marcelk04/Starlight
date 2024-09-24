@@ -13,7 +13,7 @@ struct TransformComponent {
 	glm::vec3 scale{ 1.0f, 1.0f, 1.0f };
 	glm::vec3 rotation;
 
-	glm::mat4 mat4() {
+	glm::mat4 mat4() const {
 		const float c3 = glm::cos(rotation.z);
 		const float s3 = glm::sin(rotation.z);
 		const float c2 = glm::cos(rotation.x);

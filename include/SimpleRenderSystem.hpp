@@ -4,6 +4,7 @@
 #include "Device.hpp"
 #include "Model.hpp"
 #include "GameObject.hpp"
+#include "Camera.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -28,7 +29,7 @@ public:
 	SimpleRenderSystem(const SimpleRenderSystem&) = delete;
 	SimpleRenderSystem& operator=(const SimpleRenderSystem&) = delete;
 
-	void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects);
+	void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera);
 
 private:
 	void createPipelineLayout();

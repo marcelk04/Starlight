@@ -1,5 +1,7 @@
 #include "FirstApp.hpp"
 
+#include "Camera.hpp"
+
 #include <stdexcept>
 #include <array>
 #include <iostream>
@@ -15,14 +17,19 @@ FirstApp::~FirstApp() {
 
 void FirstApp::run() {
 	SimpleRenderSystem simpleRenderSystem{ m_Device, m_Renderer.getSwapchainRenderPass() };
+	Camera camera{};
 
 	while (!m_Window.shouldClose()) {
 		glfwPollEvents();
 
+		float aspect = m_Renderer.getAspectRatio();
+		//camera.setOrthographicProjection(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+		camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
+
 		if (VkCommandBuffer commandBuffer = m_Renderer.beginFrame()) {
 			m_Renderer.beginSwapchainRenderPass(commandBuffer);
 
-			simpleRenderSystem.renderGameObjects(commandBuffer, m_GameObjects);
+			simpleRenderSystem.renderGameObjects(commandBuffer, m_GameObjects, camera);
 
 			m_Renderer.endSwapchainRenderPass(commandBuffer);
 			m_Renderer.endFrame();
@@ -97,7 +104,7 @@ void FirstApp::loadGameObjects() {
 
 	GameObject cube = GameObject::createGameObject();
 	cube.p_Model = model;
-	cube.p_Transform.translation = { 0.0f, 0.0f, 0.5f };
+	cube.p_Transform.translation = { 0.0f, 0.0f, -2.5f };
 	cube.p_Transform.scale = { 0.5f, 0.5f, 0.5f };
 
 	m_GameObjects.push_back(std::move(cube));

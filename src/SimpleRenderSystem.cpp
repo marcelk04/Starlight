@@ -16,7 +16,7 @@ SimpleRenderSystem::~SimpleRenderSystem() {
 	vkDestroyPipelineLayout(m_Device.getDevice(), m_PipelineLayout, nullptr);
 }
 
-void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects) {
+void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera) {
 	m_Pipeline->bind(commandBuffer);
 
 	for (GameObject& obj : gameObjects) {
@@ -24,7 +24,7 @@ void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::v
 		obj.p_Transform.rotation.x = glm::mod(obj.p_Transform.rotation.x + 0.005f, glm::two_pi<float>());
 
 		SimplePushConstantData push = {};
-		push.transform = obj.p_Transform.mat4();
+		push.transform = camera.getProjection() * obj.p_Transform.mat4();
 		push.color = obj.p_Color;
 
 		vkCmdPushConstants(commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
