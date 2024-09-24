@@ -7,7 +7,7 @@
 namespace stl {
 
 FirstApp::FirstApp() {
-	loadModels();
+	loadGameObjects();
 	createPipelineLayout();
 	recreateSwapchain();
 	createCommandBuffers();
@@ -26,14 +26,23 @@ void FirstApp::run() {
 	vkDeviceWaitIdle(m_Device.getDevice());
 }
 
-void FirstApp::loadModels() {
+void FirstApp::loadGameObjects() {
 	std::vector<Model::Vertex> vertices = {
 		{{ 0.0f, -0.5f }, { 1.0f, 0.0f, 0.0f }},
 		{{ 0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }},
 		{{ -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }}
 	};
 
-	m_Model = std::make_unique<Model>(m_Device, vertices);
+	auto model = std::make_shared<Model>(m_Device, vertices);
+
+	auto triangle = GameObject::createGameObject();
+	triangle.p_Model = model;
+	triangle.p_Color = { 0.1f, 0.8f, 0.1f };
+	triangle.p_Transform2D.translation.x = 0.2f;
+	triangle.p_Transform2D.scale = { 2.0f, 0.5f };
+	triangle.p_Transform2D.rotation = 0.25f * glm::two_pi<float>();
+
+	m_GameObjects.push_back(std::move(triangle));
 }
 
 void FirstApp::createPipelineLayout() {
@@ -139,9 +148,6 @@ void FirstApp::recreateSwapchain() {
 }
 
 void FirstApp::recordCommandBuffer(int imageIndex) {
-	static int frame = 0;
-	frame = (frame + 1) % 1000;
-
 	VkCommandBufferBeginInfo beginInfo = {};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -179,23 +185,28 @@ void FirstApp::recordCommandBuffer(int imageIndex) {
 	vkCmdSetViewport(m_CommandBuffers[imageIndex], 0, 1, &viewport);
 	vkCmdSetScissor(m_CommandBuffers[imageIndex], 0, 1, &scissor);
 
-	m_Pipeline->bind(m_CommandBuffers[imageIndex]);
-	m_Model->bind(m_CommandBuffers[imageIndex]);
-
-	for (int j = 0; j < 4; j++) {
-		SimplePushConstantData push = {};
-		push.offset = { -0.5f + frame * 0.02f, -0.4f + j * 0.25f };
-		push.color = { 0.0f, 0.0f, 0.2 + j * 0.2f };
-
-		vkCmdPushConstants(m_CommandBuffers[imageIndex], m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
-
-		m_Model->draw(m_CommandBuffers[imageIndex]);
-	}
+	renderGameObjects(m_CommandBuffers[imageIndex]);
 
 	vkCmdEndRenderPass(m_CommandBuffers[imageIndex]);
 
 	if (vkEndCommandBuffer(m_CommandBuffers[imageIndex]) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to record command buffer!");
+	}
+}
+
+void FirstApp::renderGameObjects(VkCommandBuffer commandBuffer) {
+	m_Pipeline->bind(commandBuffer);
+
+	for (auto& obj : m_GameObjects) {
+		SimplePushConstantData push = {};
+		push.transform = obj.p_Transform2D.mat2();
+		push.offset = obj.p_Transform2D.translation;
+		push.color = obj.p_Color;
+
+		vkCmdPushConstants(commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
+
+		obj.p_Model->bind(commandBuffer);
+		obj.p_Model->draw(commandBuffer);
 	}
 }
 
