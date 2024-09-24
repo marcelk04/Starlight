@@ -20,9 +20,11 @@ void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::v
 	m_Pipeline->bind(commandBuffer);
 
 	for (GameObject& obj : gameObjects) {
+		obj.p_Transform.rotation.y = glm::mod(obj.p_Transform.rotation.y + 0.01f, glm::two_pi<float>());
+		obj.p_Transform.rotation.x = glm::mod(obj.p_Transform.rotation.x + 0.005f, glm::two_pi<float>());
+
 		SimplePushConstantData push = {};
-		push.transform = obj.p_Transform2D.mat2();
-		push.offset = obj.p_Transform2D.translation;
+		push.transform = obj.p_Transform.mat4();
 		push.color = obj.p_Color;
 
 		vkCmdPushConstants(commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
