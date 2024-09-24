@@ -111,6 +111,10 @@ VkResult Swapchain::submitCommandBuffers(const VkCommandBuffer* buffers, uint32_
 	return result;
 }
 
+bool Swapchain::compareSwapFormats(const Swapchain& swapchain) const {
+	return swapchain.m_SwapchainDepthFormat == m_SwapchainDepthFormat && swapchain.m_SwapchainImageFormat == m_SwapchainImageFormat;
+}
+
 void Swapchain::init() {
 	createSwapchain();
 	createImageViews();
@@ -195,7 +199,7 @@ void Swapchain::createImageViews() {
 }
 
 void Swapchain::createDepthResources() {
-	VkFormat depthFormat = findDepthFormat();
+	m_SwapchainDepthFormat = findDepthFormat();
 	VkExtent2D swapchainExtent = getSwapchainExtent();
 
 	m_DepthImages.resize(imageCount());
@@ -211,7 +215,7 @@ void Swapchain::createDepthResources() {
 		imageInfo.extent.depth = 1;
 		imageInfo.mipLevels = 1;
 		imageInfo.arrayLayers = 1;
-		imageInfo.format = depthFormat;
+		imageInfo.format = m_SwapchainDepthFormat;
 		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		imageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
@@ -225,7 +229,7 @@ void Swapchain::createDepthResources() {
 		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		viewInfo.image = m_DepthImages[i];
 		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		viewInfo.format = depthFormat;
+		viewInfo.format = m_SwapchainDepthFormat;
 		viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
 		viewInfo.subresourceRange.baseMipLevel = 0;
 		viewInfo.subresourceRange.levelCount = 1;
