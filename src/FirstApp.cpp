@@ -19,6 +19,9 @@ void FirstApp::run() {
 	SimpleRenderSystem simpleRenderSystem{ m_Device, m_Renderer.getSwapchainRenderPass() };
 	Camera camera{};
 
+	//camera.setViewDirection(glm::vec3{ 0.0f }, glm::vec3{ 0.5f, 0.0f, 1.0f });
+	camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{ 0.0f, 0.0f, 2.5f });
+
 	while (!m_Window.shouldClose()) {
 		glfwPollEvents();
 
@@ -104,7 +107,7 @@ void FirstApp::loadGameObjects() {
 
 	GameObject cube = GameObject::createGameObject();
 	cube.p_Model = model;
-	cube.p_Transform.translation = { 0.0f, 0.0f, -2.5f };
+	cube.p_Transform.translation = { 0.0f, 0.0f, 2.5f };
 	cube.p_Transform.scale = { 0.5f, 0.5f, 0.5f };
 
 	m_GameObjects.push_back(std::move(cube));

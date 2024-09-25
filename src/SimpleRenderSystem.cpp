@@ -19,12 +19,14 @@ SimpleRenderSystem::~SimpleRenderSystem() {
 void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera) {
 	m_Pipeline->bind(commandBuffer);
 
+	glm::mat4 projectionView = camera.getProjection() * camera.getView();
+
 	for (GameObject& obj : gameObjects) {
 		obj.p_Transform.rotation.y = glm::mod(obj.p_Transform.rotation.y + 0.01f, glm::two_pi<float>());
 		obj.p_Transform.rotation.x = glm::mod(obj.p_Transform.rotation.x + 0.005f, glm::two_pi<float>());
 
 		SimplePushConstantData push = {};
-		push.transform = camera.getProjection() * obj.p_Transform.mat4();
+		push.transform = projectionView * obj.p_Transform.mat4();
 		push.color = obj.p_Color;
 
 		vkCmdPushConstants(commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
