@@ -1,6 +1,6 @@
 # Starlight Engine
 
-Starlight Engine is a game engine written in C++ and Vulkan. It uses GLFW for window management and glm for math. It is a work in progress and is not yet ready for use.
+Starlight Engine is a 3D game engine written in C++ using the Vulkan API. It uses GLFW for window management and glm for math. It is a work in progress and is not yet ready for use.
 
 ## Installing the Dependencies
 
@@ -28,12 +28,14 @@ You will also need to install the GLFW dependencies:
 sudo apt install libwayland-dev libxkbcommon-dev xorg-dev
 ```
 
+To compile the shaders, you will need to install glslc. Since it does not seem to be available as a package, I would recommend following the [Vulkan Tutorial](https://vulkan-tutorial.com/Development_environment#page_Shader-Compiler) or getting the library from another source.
+
 ### Linux Fedora
 
 Install the Vulkan dependencies using:
 
 ```bash
-sudo dnf install vulkan-tools vulkan-loader-devel vulkan-validation-layers-devel
+sudo dnf install vulkan-tools vulkan-loader-devel vulkan-validation-layers-devel glslc
 ```
 
 You will also need to install the GLFW dependencies:
@@ -48,14 +50,25 @@ For more information, checkout [Vulkan Tutorial](https://vulkan-tutorial.com/Dev
 
 ## Building
 
+**Note:** If the CMake script does not find glslc, you will need to compile the shaders manually. To do so, call the according script from your project directory, e.g.:
+
+```bash
+./scripts/linux_compile.sh
+```
+
 ### CMake in the Command Line
 
 Navigate to the project directory and follow these steps:
 
 ```bash
-mkdir build
 cmake -B build
 cmake --build build
+```
+
+You can the execute the example in the build ordner, for example on Linux use:
+
+```bash
+./build/Main
 ```
 
 ### Visual Studio Code
@@ -64,4 +77,4 @@ If you have the CMake Tools extension installed, you can open the project in Vis
 
 ### Visual Studio
 
-Open the folder in Visual Studio and build the project from there. See the [Visual Studio documentation](https://learn.microsoft.com/en-us/cpp/build/cmake-projects-in-visual-studio?view=msvc-170) for more information.
+Open the folder in Visual Studio and build the project from there using CMake. See the [Visual Studio documentation](https://learn.microsoft.com/en-us/cpp/build/cmake-projects-in-visual-studio?view=msvc-170) for more information.

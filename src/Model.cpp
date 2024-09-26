@@ -1,6 +1,7 @@
 #include "Model.hpp"
 
 #include <cassert>
+#include <cstring>
 
 namespace stl {
 
