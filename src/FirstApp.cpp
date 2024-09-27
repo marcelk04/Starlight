@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <array>
 #include <iostream>
+#include <chrono>
 
 namespace stl {
 
@@ -22,8 +23,16 @@ void FirstApp::run() {
 	//camera.setViewDirection(glm::vec3{ 0.0f }, glm::vec3{ 0.5f, 0.0f, 1.0f });
 	camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{ 0.0f, 0.0f, 2.5f });
 
+	auto currentTime = std::chrono::high_resolution_clock::now();
+
 	while (!m_Window.shouldClose()) {
 		glfwPollEvents();
+
+		auto newTime = std::chrono::high_resolution_clock::now();
+		float dt = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+		currentTime = newTime;
+
+		std::cout << dt << std::endl;
 
 		float aspect = m_Renderer.getAspectRatio();
 		//camera.setOrthographicProjection(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
