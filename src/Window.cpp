@@ -1,5 +1,7 @@
 #include "Window.hpp"
 
+#include "Input.hpp"
+
 #include <stdexcept>
 
 namespace stl {
@@ -7,6 +9,8 @@ namespace stl {
 Window::Window(int width, int height, const std::string& name)
 	: m_Width(width), m_Height(height), m_Name(name) {
 	initWindow();
+
+	Input::setWindowPtr(m_Window);
 }
 
 Window::~Window() {

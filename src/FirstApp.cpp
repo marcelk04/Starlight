@@ -32,8 +32,6 @@ void FirstApp::run() {
 		float dt = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 		currentTime = newTime;
 
-		std::cout << dt << std::endl;
-
 		float aspect = m_Renderer.getAspectRatio();
 		//camera.setOrthographicProjection(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
 		camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
