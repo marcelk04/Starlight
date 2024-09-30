@@ -1,6 +1,6 @@
-#include "Window.hpp"
+#include "renderer/wrapper/Window.hpp"
 
-#include "Input.hpp"
+#include "input/Input.hpp"
 
 #include <stdexcept>
 

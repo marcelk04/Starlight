@@ -1,6 +1,6 @@
-#include "Pipeline.hpp"
+#include "renderer/wrapper/Pipeline.hpp"
 
-#include "Model.hpp"
+#include "renderer/Model.hpp"
 
 #include <stdexcept>
 #include <fstream>

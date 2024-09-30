@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Window.hpp"
-#include "Pipeline.hpp"
-#include "Device.hpp"
-#include "Model.hpp"
+#include "renderer/rendersystems/SimpleRenderSystem.hpp"
+#include "renderer/wrapper/Window.hpp"
+#include "renderer/wrapper/Pipeline.hpp"
+#include "renderer/wrapper/Device.hpp"
+#include "renderer/Model.hpp"
+#include "renderer/Renderer.hpp"
 #include "GameObject.hpp"
-#include "Renderer.hpp"
-#include "SimpleRenderSystem.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

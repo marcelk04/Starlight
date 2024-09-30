@@ -1,4 +1,4 @@
-#include "Input.hpp"
+#include "input/Input.hpp"
 
 namespace stl {
 

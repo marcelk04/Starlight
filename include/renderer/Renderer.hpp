@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Window.hpp"
-#include "Device.hpp"
-#include "Swapchain.hpp"
-#include "Model.hpp"
+#include "renderer/wrapper/Window.hpp"
+#include "renderer/wrapper/Device.hpp"
+#include "renderer/wrapper/Swapchain.hpp"
+#include "renderer/Model.hpp"
 
 #include <vector>
 #include <memory>

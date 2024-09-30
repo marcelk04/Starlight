@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Pipeline.hpp"
-#include "Device.hpp"
-#include "Model.hpp"
+#include "renderer/wrapper/Pipeline.hpp"
+#include "renderer/wrapper/Device.hpp"
+#include "renderer/Model.hpp"
 #include "GameObject.hpp"
 #include "Camera.hpp"
 

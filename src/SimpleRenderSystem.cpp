@@ -1,4 +1,4 @@
-#include "SimpleRenderSystem.hpp"
+#include "renderer/rendersystems/SimpleRenderSystem.hpp"
 
 #include <cassert>
 #include <stdexcept>
