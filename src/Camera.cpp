@@ -18,12 +18,19 @@ void Camera::setPerspectiveProjection(float fovy, float aspect, float near, floa
 	m_ProjectionMatrix = glm::perspective(fovy, aspect, near, far);
 }
 
+
 void Camera::setViewDirection(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up) {
 	setViewTarget(position, position + direction, up);
 }
 
 void Camera::setViewTarget(const glm::vec3& position, const glm::vec3& target, const glm::vec3& up) {
-	m_ViewMatrix = glm::lookAt(position, target, up);
+	// rotate the coordinate system by 180 degrees around the x axis (bc why not?)
+	// this should probably be fixed in the future
+	glm::mat4 m{ 1.0f };
+	m[1][1] = -1.0f;
+	m[2][2] = -1.0f;
+
+	m_ViewMatrix = glm::lookAt(position, target, up) * m;
 }
 
 void Camera::setViewYXZ(const glm::vec3& position, const glm::vec3& rotation) {

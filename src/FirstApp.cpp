@@ -1,5 +1,6 @@
 #include "FirstApp.hpp"
 
+#include "input/Input.hpp"
 #include "Camera.hpp"
 
 #include <stdexcept>
@@ -21,7 +22,7 @@ void FirstApp::run() {
 	Camera camera{};
 
 	//camera.setViewDirection(glm::vec3{ 0.0f }, glm::vec3{ 0.5f, 0.0f, 1.0f });
-	camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{ 0.0f, 0.0f, 2.5f });
+	camera.setViewTarget(glm::vec3{ 0.0f, 0.0f, -2.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f });
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 
@@ -33,11 +34,12 @@ void FirstApp::run() {
 		currentTime = newTime;
 
 		float aspect = m_Renderer.getAspectRatio();
-		//camera.setOrthographicProjection(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
 		camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
 
 		if (VkCommandBuffer commandBuffer = m_Renderer.beginFrame()) {
 			m_Renderer.beginSwapchainRenderPass(commandBuffer);
+
+			//m_GameObjects[0].p_Transform.rotation.x += dt * glm::two_pi<float>() * 0.1f;
 
 			simpleRenderSystem.renderGameObjects(commandBuffer, m_GameObjects, camera);
 
@@ -114,7 +116,7 @@ void FirstApp::loadGameObjects() {
 
 	GameObject cube = GameObject::createGameObject();
 	cube.p_Model = model;
-	cube.p_Transform.translation = { 0.0f, 0.0f, 2.5f };
+	cube.p_Transform.translation = { 0.0f, 0.0f, 0.0f };
 	cube.p_Transform.scale = { 0.5f, 0.5f, 0.5f };
 
 	m_GameObjects.push_back(std::move(cube));
