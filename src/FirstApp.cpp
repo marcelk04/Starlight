@@ -2,6 +2,7 @@
 
 #include "input/Input.hpp"
 #include "Camera.hpp"
+#include "KeyboardMovementController.hpp"
 
 #include <stdexcept>
 #include <array>
@@ -21,7 +22,11 @@ void FirstApp::run() {
 	SimpleRenderSystem simpleRenderSystem{ m_Device, m_Renderer.getSwapchainRenderPass() };
 	Camera camera{};
 
-	camera.setViewTarget(glm::vec3{0.0f, 0.0f, 2.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f });
+	GameObject viewerObject = GameObject::createGameObject();
+	viewerObject.p_Transform.translation = { 0.0f, 0.0f, 2.0f };
+	KeyboardMovementController cameraController{};
+
+	//camera.setViewTarget(glm::vec3{0.0f, 0.0f, 2.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f });
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 
@@ -31,6 +36,9 @@ void FirstApp::run() {
 		auto newTime = std::chrono::high_resolution_clock::now();
 		float dt = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 		currentTime = newTime;
+
+		cameraController.moveInPlaneXZ(dt, viewerObject);
+		camera.setViewYXZ(viewerObject.p_Transform.translation, viewerObject.p_Transform.rotation);
 
 		float aspect = m_Renderer.getAspectRatio();
 		camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
