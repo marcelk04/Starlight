@@ -8,8 +8,10 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(external/glfw)
+add_subdirectory(external/tinyobjloader)
 
 include_directories(external/glm)
+include_directories(external/tinyobjloader)
 include_directories(include)
 
 file(GLOB SRC_FILES ${PROJECT_SOURCE_DIR}/src/*.cpp)
@@ -21,7 +23,7 @@ add_compile_definitions(PROJ_DIR="${PROJECT_SOURCE_DIR}")
 
 add_executable(Main "examples/Main.cpp" ${SRC_FILES})
 
-target_link_libraries(Main Vulkan::Vulkan glfw)
+target_link_libraries(Main Vulkan::Vulkan glfw tinyobjloader)
 
 if (Vulkan_glslc_FOUND)
 	message("glslc found")
