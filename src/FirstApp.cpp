@@ -21,8 +21,7 @@ void FirstApp::run() {
 	SimpleRenderSystem simpleRenderSystem{ m_Device, m_Renderer.getSwapchainRenderPass() };
 	Camera camera{};
 
-	//camera.setViewDirection(glm::vec3{ 0.0f }, glm::vec3{ 0.5f, 0.0f, 1.0f });
-	camera.setViewTarget(glm::vec3{ 0.0f, 0.0f, -2.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f });
+	camera.setViewTarget(glm::vec3{0.0f, 0.0f, 2.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f });
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 
@@ -39,8 +38,6 @@ void FirstApp::run() {
 		if (VkCommandBuffer commandBuffer = m_Renderer.beginFrame()) {
 			m_Renderer.beginSwapchainRenderPass(commandBuffer);
 
-			//m_GameObjects[0].p_Transform.rotation.x += dt * glm::two_pi<float>() * 0.1f;
-
 			simpleRenderSystem.renderGameObjects(commandBuffer, m_GameObjects, camera);
 
 			m_Renderer.endSwapchainRenderPass(commandBuffer);
@@ -53,55 +50,53 @@ void FirstApp::run() {
 
 std::unique_ptr<Model> createCubeModel(Device& device, glm::vec3 offset) {
 	std::vector<Model::Vertex> vertices{
+		// front face +z (red)
+		{{-1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+		{{1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+		{{1.0f, -1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+		{{-1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+		{{1.0f, -1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+		{{-1.0f, -1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
 
-		// left face (white)
-		{{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
-		{{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
-		{{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
-		{{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
-		{{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
-		{{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+		// top face +y (green)
+		{{-1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}},
+		{{1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}},
+		{{1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+		{{-1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}},
+		{{1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+		{{-1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
 
-		// right face (yellow)
-		{{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
-		{{.5f, .5f, .5f}, {.8f, .8f, .1f}},
-		{{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
-		{{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
-		{{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
-		{{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+		// right face +x (blue)
+		{{1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+		{{1.0f, 1.0f, -1.0f}, {0.0f, 0.0f, 1.0f}},
+		{{1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, 1.0f}},
+		{{1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+		{{1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, 1.0f}},
+		{{1.0f, -1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
 
-		// top face (orange, remember y axis points down)
-		{{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-		{{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-		{{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-		{{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-		{{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-		{{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+		// back face -z (yellow)
+		{{-1.0f, 1.0f, -1.0f}, {1.0f, 1.0f, 0.0f}},
+		{{1.0f, 1.0f, -1.0f}, {1.0f, 1.0f, 0.0f}},
+		{{1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 0.0f}},
+		{{-1.0f, 1.0f, -1.0f}, {1.0f, 1.0f, 0.0f}},
+		{{1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 0.0f}},
+		{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 0.0f}},
 
-		// bottom face (red)
-		{{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-		{{.5f, .5f, .5f}, {.8f, .1f, .1f}},
-		{{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
-		{{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-		{{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-		{{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+		// bottom face -y (cyan)
+		{{-1.0f, -1.0f, -1.0f}, {0.0f, 1.0f, 1.0f}},
+		{{1.0f, -1.0f, -1.0f}, {0.0f, 1.0f, 1.0f}},
+		{{1.0f, -1.0f, 1.0f}, {0.0f, 1.0f, 1.0f}},
+		{{-1.0f, -1.0f, -1.0f}, {0.0f, 1.0f, 1.0f}},
+		{{1.0f, -1.0f, 1.0f}, {0.0f, 1.0f, 1.0f}},
+		{{-1.0f, -1.0f, 1.0f}, {0.0f, 1.0f, 1.0f}},
 
-		// nose face (blue)
-		{{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-		{{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-		{{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-		{{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-		{{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-		{{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-
-		// tail face (green)
-		{{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-		{{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-		{{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-		{{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-		{{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-		{{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-
+		// left face -x (magenta)
+		{{-1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 1.0f}},
+		{{-1.0f, 1.0f, -1.0f}, {1.0f, 0.0f, 1.0f}},
+		{{-1.0f, -1.0f, -1.0f}, {1.0f, 0.0f, 1.0f}},
+		{{-1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 1.0f}},
+		{{-1.0f, -1.0f, -1.0f}, {1.0f, 0.0f, 1.0f}},
+		{{-1.0f, -1.0f, 1.0f}, {1.0f, 0.0f, 1.0f}}
 	};
 
 	for (auto& v : vertices) {
@@ -117,7 +112,7 @@ void FirstApp::loadGameObjects() {
 	GameObject cube = GameObject::createGameObject();
 	cube.p_Model = model;
 	cube.p_Transform.translation = { 0.0f, 0.0f, 0.0f };
-	cube.p_Transform.scale = { 0.5f, 0.5f, 0.5f };
+	cube.p_Transform.scale = { 0.25f, 0.25f, 0.25f };
 
 	m_GameObjects.push_back(std::move(cube));
 }
