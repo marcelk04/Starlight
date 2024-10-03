@@ -4,7 +4,7 @@
 
 namespace stl {
 
-void KeyboardMovementController::moveInPlaneXZ(float dt, GameObject& gameObject) {
+void KeyboardMovementController::moveInPlaneXZ(float dt, GameObject& gameObject) const {
 	glm::vec3 rotate{ 0.0f };
 
 	if (Input::isKeyPressed(p_Keys.lookLeft)) rotate.y += 1.0f;

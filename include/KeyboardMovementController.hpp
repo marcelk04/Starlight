@@ -22,14 +22,13 @@ public:
 	};
 
 public:
-	void moveInPlaneXZ(float dt, GameObject& gameObject);
+	void moveInPlaneXZ(float dt, GameObject& gameObject) const;
 
 public:
 	KeyMappings p_Keys{};
 
 	float p_MoveSpeed{ 3.0f };
 	float p_LookSpeed{ 1.5f };
-
 };
 
 }
