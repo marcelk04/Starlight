@@ -13,22 +13,8 @@ struct TransformComponent {
 	glm::vec3 scale{ 1.0f, 1.0f, 1.0f };
 	glm::vec3 rotation;
 
-	glm::mat4 mat4() const {
-		glm::mat4 transform{ 1.0f };
-
-		// translation
-		transform = glm::translate(transform, translation);
-
-		// yxz rotation
-		transform = glm::rotate(transform, rotation.y, { 0.0f, 1.0f, 0.0f });
-		transform = glm::rotate(transform, rotation.x, { 1.0f, 0.0f, 0.0f });
-		transform = glm::rotate(transform, rotation.z, { 0.0f, 0.0f, 1.0f });
-
-		// scaling
-		transform = glm::scale(transform, scale);
-
-		return transform;
-	}
+	glm::mat4 modelMatrix() const;
+	glm::mat3 normalMatrix() const;
 };
 
 class GameObject {

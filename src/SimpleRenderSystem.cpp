@@ -23,8 +23,8 @@ void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::v
 
 	for (GameObject& obj : gameObjects) {
 		SimplePushConstantData push = {};
-		push.transform = projectionView * obj.p_Transform.mat4();
-		push.color = obj.p_Color;
+		push.transform = projectionView * obj.p_Transform.modelMatrix();
+		push.normalMatrix = obj.p_Transform.normalMatrix();
 
 		vkCmdPushConstants(commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 
