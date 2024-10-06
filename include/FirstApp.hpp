@@ -4,6 +4,7 @@
 #include "renderer/wrapper/Window.hpp"
 #include "renderer/wrapper/Pipeline.hpp"
 #include "renderer/wrapper/Device.hpp"
+#include "renderer/wrapper/Descriptors.hpp"
 #include "renderer/Model.hpp"
 #include "renderer/Renderer.hpp"
 #include "GameObject.hpp"
@@ -39,6 +40,8 @@ private:
 	Window m_Window{ WIDTH, HEIGHT, "Starlight" };
 	Device m_Device{ m_Window };
 	Renderer m_Renderer{ m_Window, m_Device };
+
+	std::unique_ptr<DescriptorPool> m_GlobalPool{};
 
 	std::vector<GameObject> m_GameObjects;
 };

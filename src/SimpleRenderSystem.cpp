@@ -6,9 +6,9 @@
 
 namespace stl {
 
-SimpleRenderSystem::SimpleRenderSystem(Device& device, VkRenderPass renderPass)
+SimpleRenderSystem::SimpleRenderSystem(Device& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
 	: m_Device{ device } {
-	createPipelineLayout();
+	createPipelineLayout(globalSetLayout);
 	createPipeline(renderPass);
 }
 
@@ -16,33 +16,35 @@ SimpleRenderSystem::~SimpleRenderSystem() {
 	vkDestroyPipelineLayout(m_Device.getDevice(), m_PipelineLayout, nullptr);
 }
 
-void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera) {
-	m_Pipeline->bind(commandBuffer);
+void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) {
+	m_Pipeline->bind(frameInfo.commandBuffer);
 
-	glm::mat4 projectionView = camera.getProjection() * camera.getView();
+	vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &frameInfo.globalDescriptorSet, 0, nullptr);
 
 	for (GameObject& obj : gameObjects) {
 		SimplePushConstantData push = {};
-		push.transform = projectionView * obj.p_Transform.modelMatrix();
+		push.modelMatrix = obj.p_Transform.modelMatrix();
 		push.normalMatrix = obj.p_Transform.normalMatrix();
 
-		vkCmdPushConstants(commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
+		vkCmdPushConstants(frameInfo.commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 
-		obj.p_Model->bind(commandBuffer);
-		obj.p_Model->draw(commandBuffer);
+		obj.p_Model->bind(frameInfo.commandBuffer);
+		obj.p_Model->draw(frameInfo.commandBuffer);
 	}
 }
 
-void SimpleRenderSystem::createPipelineLayout() {
+void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
 	VkPushConstantRange pushConstantRange = {};
 	pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 	pushConstantRange.offset = 0;
 	pushConstantRange.size = sizeof(SimplePushConstantData);
 
+	std::vector<VkDescriptorSetLayout> descriptorSetLayouts{ globalSetLayout };
+
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = 0;
-	pipelineLayoutInfo.pSetLayouts = nullptr;
+	pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+	pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
 	pipelineLayoutInfo.pushConstantRangeCount = 1;
 	pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 

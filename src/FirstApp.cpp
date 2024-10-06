@@ -1,6 +1,7 @@
 #include "FirstApp.hpp"
 
 #include "input/Input.hpp"
+#include "renderer/wrapper/Buffer.hpp"
 #include "Camera.hpp"
 #include "KeyboardMovementController.hpp"
 
@@ -11,7 +12,17 @@
 
 namespace stl {
 
+struct GlobalUbo {
+	alignas(16) glm::mat4 projectionView{ 1.0f };
+	alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.0f, 3.0f, 1.0f });
+};
+
 FirstApp::FirstApp() {
+	m_GlobalPool = DescriptorPool::Builder(m_Device)
+		.setMaxSets(Swapchain::MAX_FRAMES_IN_FLIGHT)
+		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, Swapchain::MAX_FRAMES_IN_FLIGHT)
+		.build();
+
 	loadGameObjects();
 }
 
@@ -19,7 +30,33 @@ FirstApp::~FirstApp() {
 }
 
 void FirstApp::run() {
-	SimpleRenderSystem simpleRenderSystem{ m_Device, m_Renderer.getSwapchainRenderPass() };
+	std::vector<std::unique_ptr<Buffer>> uboBuffers(Swapchain::MAX_FRAMES_IN_FLIGHT);
+
+	for (int i = 0; i < uboBuffers.size(); i++) {
+		uboBuffers[i] = std::make_unique<Buffer>(m_Device,
+			sizeof(GlobalUbo),
+			Swapchain::MAX_FRAMES_IN_FLIGHT,
+			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
+		uboBuffers[i]->map();
+	}
+
+	auto globalSetLayout = DescriptorSetLayout::Builder(m_Device)
+		.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+		.build();
+
+	std::vector<VkDescriptorSet> globalDescriptorSets(Swapchain::MAX_FRAMES_IN_FLIGHT);
+
+	for (int i = 0; i < globalDescriptorSets.size(); i++) {
+		auto bufferInfo = uboBuffers[i]->descriptorInfo();
+
+		DescriptorWriter(*globalSetLayout, *m_GlobalPool)
+			.writeBuffer(0, &bufferInfo)
+			.build(globalDescriptorSets[i]);
+	}
+
+	SimpleRenderSystem simpleRenderSystem{ m_Device, m_Renderer.getSwapchainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
 	Camera camera{};
 
 	GameObject viewerObject = GameObject::createGameObject();
@@ -42,9 +79,19 @@ void FirstApp::run() {
 		camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
 
 		if (VkCommandBuffer commandBuffer = m_Renderer.beginFrame()) {
+			int frameIndex = m_Renderer.getFrameIndex();
+			FrameInfo frameInfo{ frameIndex, dt, commandBuffer, camera, globalDescriptorSets[frameIndex]};
+
+			// update
+			GlobalUbo ubo{};
+			ubo.projectionView = camera.getProjection() * camera.getView();
+			uboBuffers[frameIndex]->writeToBuffer(&ubo);
+			uboBuffers[frameIndex]->flush();
+
+			// render
 			m_Renderer.beginSwapchainRenderPass(commandBuffer);
 
-			simpleRenderSystem.renderGameObjects(commandBuffer, m_GameObjects, camera);
+			simpleRenderSystem.renderGameObjects(frameInfo, m_GameObjects);
 
 			m_Renderer.endSwapchainRenderPass(commandBuffer);
 			m_Renderer.endFrame();
