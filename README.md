@@ -65,7 +65,7 @@ cmake -B build
 cmake --build build
 ```
 
-You can the execute the example in the build ordner, for example on Linux use:
+You can the execute the example in the build directory, for example on Linux use:
 
 ```bash
 ./build/Main

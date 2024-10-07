@@ -13,8 +13,10 @@
 namespace stl {
 
 struct GlobalUbo {
-	alignas(16) glm::mat4 projectionView{ 1.0f };
-	alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.0f, 3.0f, 1.0f });
+	glm::mat4 projectionView{ 1.0f };
+	glm::vec4 ambientLightColor{ 1.0f, 1.0f, 1.0f, 0.02f };
+	glm::vec3 lightPosition{ -1.0f, 1.0f, 1.0f };
+	alignas(16) glm::vec4 lightColor{ 1.0f }; // w is light intensity
 };
 
 FirstApp::FirstApp() {
@@ -43,7 +45,7 @@ void FirstApp::run() {
 	}
 
 	auto globalSetLayout = DescriptorSetLayout::Builder(m_Device)
-		.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+		.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
 		.build();
 
 	std::vector<VkDescriptorSet> globalDescriptorSets(Swapchain::MAX_FRAMES_IN_FLIGHT);
@@ -60,7 +62,7 @@ void FirstApp::run() {
 	Camera camera{};
 
 	GameObject viewerObject = GameObject::createGameObject();
-	viewerObject.p_Transform.translation = { 0.0f, 0.0f, 2.0f };
+	viewerObject.p_Transform.translation = { 0.0f, 0.0f, 2.5f };
 	KeyboardMovementController cameraController{};
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
@@ -76,7 +78,7 @@ void FirstApp::run() {
 		camera.setViewYXZ(viewerObject.p_Transform.translation, viewerObject.p_Transform.rotation);
 
 		float aspect = m_Renderer.getAspectRatio();
-		camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
+		camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 100.0f);
 
 		if (VkCommandBuffer commandBuffer = m_Renderer.beginFrame()) {
 			int frameIndex = m_Renderer.getFrameIndex();
@@ -102,14 +104,29 @@ void FirstApp::run() {
 }
 
 void FirstApp::loadGameObjects() {
-	std::shared_ptr<Model> model = Model::createModelFromFile(m_Device, "assets/models/flat_vase.obj");
+	std::shared_ptr<Model> flatVaseModel = Model::createModelFromFile(m_Device, "assets/models/flat_vase.obj");
 
-	GameObject gameObj = GameObject::createGameObject();
-	gameObj.p_Model = model;
-	gameObj.p_Transform.translation = { 0.0f, 0.0f, 0.0f };
-	gameObj.p_Transform.scale = glm::vec3{ 3.0f };
+	GameObject flatVase = GameObject::createGameObject();
+	flatVase.p_Model = flatVaseModel;
+	flatVase.p_Transform.translation = { -0.5f, -0.5f, 0.0f };
+	flatVase.p_Transform.scale = { 3.0f, -1.5f, 3.0f }; // negative y scale bc y axis of model is flipped
+	m_GameObjects.push_back(std::move(flatVase));
 
-	m_GameObjects.push_back(std::move(gameObj));
+	std::shared_ptr<Model> smoothVaseModel = Model::createModelFromFile(m_Device, "assets/models/smooth_vase.obj");
+
+	GameObject smoothVase = GameObject::createGameObject();
+	smoothVase.p_Model = smoothVaseModel;
+	smoothVase.p_Transform.translation = { 0.5f, -0.5f, 0.0f };
+	smoothVase.p_Transform.scale = { 3.0f, -1.5f, 3.0f };
+	m_GameObjects.push_back(std::move(smoothVase));
+
+	std::shared_ptr<Model> floorModel = Model::createModelFromFile(m_Device, "assets/models/quad.obj");
+
+	GameObject floor = GameObject::createGameObject();
+	floor.p_Model = floorModel;
+	floor.p_Transform.translation = { 0.0f, -0.5f, 0.0f };
+	floor.p_Transform.scale = { 3.0f, 1.0f, 3.0f };
+	m_GameObjects.push_back(std::move(floor));
 }
 
 }

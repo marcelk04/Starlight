@@ -3,7 +3,7 @@
 #include "input/KeyCodes.hpp"
 #include "input/MouseButtonCodes.hpp"
 
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 
 #include <utility>
 
