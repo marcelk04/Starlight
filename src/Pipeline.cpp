@@ -23,15 +23,18 @@ Pipeline::~Pipeline() {
 }
 
 void Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
-	configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-	configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-	configInfo.inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
+	configInfo.bindingDescriptions = Model::Vertex::getBindingDescriptions();
+	configInfo.attributeDescriptions = Model::Vertex::getAttributeDescriptions();
 
 	configInfo.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 	configInfo.viewportInfo.viewportCount = 1;
 	configInfo.viewportInfo.pViewports = nullptr;
 	configInfo.viewportInfo.scissorCount = 1;
 	configInfo.viewportInfo.pScissors = nullptr;
+
+	configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+	configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	configInfo.inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
 
 	configInfo.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 	configInfo.rasterizationInfo.depthClampEnable = VK_FALSE;
@@ -140,8 +143,8 @@ void Pipeline::createGraphicsPipeline(const std::string& vsFilepath, const std::
 	shaderStages[1].pSpecializationInfo = nullptr;
 	shaderStages[1].pNext = nullptr;
 
-	auto bindingDescriptions = Model::Vertex::getBindingDescriptions();
-	auto attributeDescriptions = Model::Vertex::getAttributeDescriptions();
+	auto& bindingDescriptions = configInfo.bindingDescriptions;
+	auto& attributeDescriptions = configInfo.attributeDescriptions;
 
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;

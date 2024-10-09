@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <memory>
+#include <unordered_map>
 
 namespace stl {
 
@@ -20,6 +21,7 @@ struct TransformComponent {
 class GameObject {
 public:
 	using id_t = uint32_t;
+	using Map = std::unordered_map<id_t, GameObject>;
 
 public:
 	GameObject(const GameObject&) = delete;

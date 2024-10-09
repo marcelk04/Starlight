@@ -13,7 +13,8 @@
 namespace stl {
 
 struct GlobalUbo {
-	glm::mat4 projectionView{ 1.0f };
+	glm::mat4 projection{ 1.0f };
+	glm::mat4 view{ 1.0f };
 	glm::vec4 ambientLightColor{ 1.0f, 1.0f, 1.0f, 0.02f };
 	glm::vec3 lightPosition{ -1.0f, 1.0f, 1.0f };
 	alignas(16) glm::vec4 lightColor{ 1.0f }; // w is light intensity
@@ -58,7 +59,8 @@ void FirstApp::run() {
 			.build(globalDescriptorSets[i]);
 	}
 
-	SimpleRenderSystem simpleRenderSystem{ m_Device, m_Renderer.getSwapchainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
+	SimpleRenderSystem simpleRenderSystem{ m_Device, m_Renderer.getSwapchainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+	PointLightSystem pointLightSystem{ m_Device, m_Renderer.getSwapchainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 	Camera camera{};
 
 	GameObject viewerObject = GameObject::createGameObject();
@@ -82,18 +84,20 @@ void FirstApp::run() {
 
 		if (VkCommandBuffer commandBuffer = m_Renderer.beginFrame()) {
 			int frameIndex = m_Renderer.getFrameIndex();
-			FrameInfo frameInfo{ frameIndex, dt, commandBuffer, camera, globalDescriptorSets[frameIndex]};
+			FrameInfo frameInfo{ frameIndex, dt, commandBuffer, camera, globalDescriptorSets[frameIndex], m_GameObjects };
 
 			// update
 			GlobalUbo ubo{};
-			ubo.projectionView = camera.getProjection() * camera.getView();
+			ubo.projection = camera.getProjection();
+			ubo.view = camera.getView();
 			uboBuffers[frameIndex]->writeToBuffer(&ubo);
 			uboBuffers[frameIndex]->flush();
 
 			// render
 			m_Renderer.beginSwapchainRenderPass(commandBuffer);
 
-			simpleRenderSystem.renderGameObjects(frameInfo, m_GameObjects);
+			simpleRenderSystem.renderGameObjects(frameInfo);
+			pointLightSystem.render(frameInfo);
 
 			m_Renderer.endSwapchainRenderPass(commandBuffer);
 			m_Renderer.endFrame();
@@ -110,7 +114,7 @@ void FirstApp::loadGameObjects() {
 	flatVase.p_Model = flatVaseModel;
 	flatVase.p_Transform.translation = { -0.5f, -0.5f, 0.0f };
 	flatVase.p_Transform.scale = { 3.0f, -1.5f, 3.0f }; // negative y scale bc y axis of model is flipped
-	m_GameObjects.push_back(std::move(flatVase));
+	m_GameObjects.emplace(flatVase.getId(), std::move(flatVase));
 
 	std::shared_ptr<Model> smoothVaseModel = Model::createModelFromFile(m_Device, "assets/models/smooth_vase.obj");
 
@@ -118,7 +122,7 @@ void FirstApp::loadGameObjects() {
 	smoothVase.p_Model = smoothVaseModel;
 	smoothVase.p_Transform.translation = { 0.5f, -0.5f, 0.0f };
 	smoothVase.p_Transform.scale = { 3.0f, -1.5f, 3.0f };
-	m_GameObjects.push_back(std::move(smoothVase));
+	m_GameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
 	std::shared_ptr<Model> floorModel = Model::createModelFromFile(m_Device, "assets/models/quad.obj");
 
@@ -126,7 +130,7 @@ void FirstApp::loadGameObjects() {
 	floor.p_Model = floorModel;
 	floor.p_Transform.translation = { 0.0f, -0.5f, 0.0f };
 	floor.p_Transform.scale = { 3.0f, 1.0f, 3.0f };
-	m_GameObjects.push_back(std::move(floor));
+	m_GameObjects.emplace(floor.getId(), std::move(floor));
 }
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "renderer/rendersystems/SimpleRenderSystem.hpp"
+#include "renderer/rendersystems/PointLightSystem.hpp"
 #include "renderer/wrapper/Window.hpp"
 #include "renderer/wrapper/Pipeline.hpp"
 #include "renderer/wrapper/Device.hpp"
@@ -43,7 +44,7 @@ private:
 
 	std::unique_ptr<DescriptorPool> m_GlobalPool{};
 
-	std::vector<GameObject> m_GameObjects;
+	GameObject::Map m_GameObjects;
 };
 
 }
