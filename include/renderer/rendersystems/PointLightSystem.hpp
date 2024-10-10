@@ -17,6 +17,12 @@
 
 namespace stl {
 
+struct PointLightPushConstants {
+	glm::vec4 position{};
+	glm::vec4 color{};
+	float radius;
+};
+
 class PointLightSystem {
 public:
 	PointLightSystem(Device& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
@@ -25,6 +31,7 @@ public:
 	PointLightSystem(const PointLightSystem&) = delete;
 	PointLightSystem& operator=(const PointLightSystem&) = delete;
 
+	void update(FrameInfo& frameInfo, GlobalUbo& ubo);
 	void render(FrameInfo& frameInfo);
 
 private:

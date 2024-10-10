@@ -22,6 +22,8 @@ void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
 	vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &frameInfo.globalDescriptorSet, 0, nullptr);
 
 	for (auto& [id, obj] : frameInfo.gameObjects) {
+		if (obj.p_Model == nullptr) continue;
+
 		SimplePushConstantData push = {};
 		push.modelMatrix = obj.p_Transform.modelMatrix();
 		push.normalMatrix = obj.p_Transform.normalMatrix();

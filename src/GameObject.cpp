@@ -7,6 +7,16 @@ GameObject GameObject::createGameObject() {
 	return GameObject{ currentId++ };
 }
 
+GameObject GameObject::createPointLight(float intensity, float radius, glm::vec3 color) {
+	GameObject obj = GameObject::createGameObject();
+	obj.p_Color = color;
+	obj.p_Transform.scale.x = radius;
+	obj.p_PointLight.emplace();
+	obj.p_PointLight->lightIntensity = intensity;
+
+	return obj;
+}
+
 GameObject::GameObject(id_t objectId)
 	: m_Id{ objectId } {
 }

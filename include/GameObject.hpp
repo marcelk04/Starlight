@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <optional>
 
 namespace stl {
 
@@ -16,6 +17,10 @@ struct TransformComponent {
 
 	glm::mat4 modelMatrix() const;
 	glm::mat3 normalMatrix() const;
+};
+
+struct PointLightComponent {
+	float lightIntensity = 1.0f;
 };
 
 class GameObject {
@@ -31,6 +36,7 @@ public:
 	GameObject& operator=(GameObject&&) = default;
 
 	static GameObject createGameObject();
+	static GameObject createPointLight(float intensity = 1.0f, float radius = 0.1f, glm::vec3 color = { 1.0f, 1.0f, 1.0f });
 
 	id_t getId() const { return m_Id; };
 
@@ -40,7 +46,9 @@ private:
 public:
 	std::shared_ptr<Model> p_Model{};
 	glm::vec3 p_Color{};
+
 	TransformComponent p_Transform{};
+	std::optional<PointLightComponent> p_PointLight = std::nullopt;
 
 private:
 	id_t m_Id;
