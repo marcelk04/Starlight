@@ -3,6 +3,7 @@
 #include <cassert>
 #include <stdexcept>
 #include <array>
+#include <map>
 
 namespace stl {
 
@@ -32,12 +33,23 @@ void PointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo) {
 }
 
 void PointLightSystem::render(FrameInfo& frameInfo) {
+	// sort lights
+	std::map<float, GameObject::id_t> sorted;
+	for (auto& [id, obj] : frameInfo.gameObjects) {
+		if (!obj.p_PointLight.has_value()) continue;
+
+		glm::vec3 offset = frameInfo.camera.getPosition() - obj.p_Transform.translation;
+		float distSquared = glm::dot(offset, offset);
+		sorted[distSquared] = obj.getId();
+	}
+
 	m_Pipeline->bind(frameInfo.commandBuffer);
 
 	vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &frameInfo.globalDescriptorSet, 0, nullptr);
 
-	for (auto& [id, obj] : frameInfo.gameObjects) {
-		if (!obj.p_PointLight.has_value()) continue;
+	// iterate through sorted map in reverse order
+	for (auto it = sorted.rbegin(); it != sorted.rend(); ++it) {
+		GameObject& obj = frameInfo.gameObjects.at(it->second);
 
 		PointLightPushConstants push{};
 		push.position = glm::vec4(obj.p_Transform.translation, 1.0f);
@@ -75,6 +87,7 @@ void PointLightSystem::createPipeline(VkRenderPass renderPass) {
 
 	PipelineConfigInfo pipelineConfig{};
 	Pipeline::defaultPipelineConfigInfo(pipelineConfig);
+	Pipeline::enableAlphaBlend(pipelineConfig);
 
 	pipelineConfig.bindingDescriptions.clear();
 	pipelineConfig.attributeDescriptions.clear();

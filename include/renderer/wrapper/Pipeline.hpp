@@ -38,6 +38,7 @@ public:
 	Pipeline& operator=(const Pipeline&) = delete;
 
 	static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
+	static void enableAlphaBlend(PipelineConfigInfo& configInfo);
 
 	void bind(VkCommandBuffer commandBuffer) const;
 

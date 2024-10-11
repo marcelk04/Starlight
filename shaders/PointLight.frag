@@ -24,12 +24,15 @@ layout(push_constant) uniform Push {
 	float radius;
 } push;
 
-void main() {
-	float dist = sqrt(dot(sOffset, sOffset));
+const float PI = 3.14159265359;
 
-	if (dist > 1.0) {
+void main() {
+	float distSquared = dot(sOffset, sOffset);
+
+	if (distSquared > 1.0) {
 		discard;
 	}
+	float cosTerm = 0.5 * (cos(distSquared * PI) + 1.0);
 
-	outColor = vec4(push.color.rgb, 1.0);
+	outColor = vec4(push.color.rgb + cosTerm, cosTerm);
 }
