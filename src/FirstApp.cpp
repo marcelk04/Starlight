@@ -1,6 +1,7 @@
 #include "FirstApp.hpp"
 
 #include "Core/Logger.hpp"
+#include "Core/Asserts.hpp"
 #include "input/Input.hpp"
 #include "renderer/wrapper/Buffer.hpp"
 #include "Camera.hpp"

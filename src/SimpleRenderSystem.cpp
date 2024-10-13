@@ -1,6 +1,7 @@
 #include "renderer/rendersystems/SimpleRenderSystem.hpp"
 
-#include <cassert>
+#include "Core/Asserts.hpp"
+
 #include <stdexcept>
 #include <array>
 
@@ -56,7 +57,7 @@ void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLay
 }
 
 void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
-	assert(m_PipelineLayout != nullptr && "Cannot create pipeline before pipeline layout!");
+	SASSERT_MSG(m_PipelineLayout != nullptr, "Cannot create pipeline before pipeline layout!");
 
 	PipelineConfigInfo pipelineConfig{};
 	Pipeline::defaultPipelineConfigInfo(pipelineConfig);

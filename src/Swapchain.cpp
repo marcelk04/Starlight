@@ -376,7 +376,7 @@ VkPresentModeKHR Swapchain::chooseSwapPresentMode(const std::vector<VkPresentMod
 	}
 	*/
 
-	SINFO("Present move: V-Sync");
+	SINFO("Present mode: V-Sync");
 
 	return VK_PRESENT_MODE_FIFO_KHR;
 }

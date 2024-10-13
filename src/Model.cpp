@@ -1,12 +1,12 @@
 #include "renderer/Model.hpp"
 
+#include "Core/Asserts.hpp"
 #include "Core/Common.hpp"
 
 #include <tiny_obj_loader.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
-#include <cassert>
 #include <cstring>
 #include <filesystem>
 #include <unordered_map>
@@ -62,7 +62,7 @@ void Model::draw(VkCommandBuffer commandBuffer) const {
 void Model::createVertexBuffers(const std::vector<Vertex>& vertices) {
 	m_VertexCount = static_cast<uint32_t>(vertices.size());
 
-	assert(m_VertexCount >= 3 && "Vertex count must be at least 3");
+	SASSERT_MSG(m_VertexCount >= 3, "Vertex count must be at least 3");
 
 	uint32_t vertexSize = sizeof(vertices[0]);
 	VkDeviceSize bufferSize = vertexSize * m_VertexCount;

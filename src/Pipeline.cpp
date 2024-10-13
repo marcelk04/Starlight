@@ -1,13 +1,13 @@
 #include "renderer/wrapper/Pipeline.hpp"
 
-#include "renderer/Model.hpp"
+#include "Core/Asserts.hpp"
 #include "Core/Common.hpp"
+#include "renderer/Model.hpp"
 
 #include <stdexcept>
 #include <fstream>
 #include <iostream>
 #include <filesystem>
-#include <cassert>
 
 namespace stl {
 
@@ -111,8 +111,8 @@ void Pipeline::bind(VkCommandBuffer commandBuffer) const {
 }
 
 void Pipeline::createGraphicsPipeline(const std::string& vsFilepath, const std::string& fsFilepath, const PipelineConfigInfo& configInfo) {
-	assert(configInfo.pipelineLayout != VK_NULL_HANDLE && "Cannot create graphics pipeline: no pipeline layout provided in configInfo!");
-	assert(configInfo.renderPass != VK_NULL_HANDLE && "Cannot create graphics pipeline: no render pass provided in configInfo!");
+	SASSERT_MSG(configInfo.pipelineLayout != VK_NULL_HANDLE, "Cannot create graphics pipeline: no pipeline layout provided in configInfo");
+	SASSERT_MSG(configInfo.renderPass != VK_NULL_HANDLE, "Cannot create graphics pipeline: no render pass provided in configInfo");
 
 	auto vertCode = Common::readFile(vsFilepath);
 	auto fragCode = Common::readFile(fsFilepath);

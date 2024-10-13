@@ -1,8 +1,9 @@
 #include "renderer/Renderer.hpp"
 
+#include "Core/Asserts.hpp"
+
 #include <array>
 #include <stdexcept>
-#include <cassert>
 
 namespace stl {
 
@@ -17,17 +18,17 @@ Renderer::~Renderer() {
 }
 
 VkCommandBuffer Renderer::getCurrentCommandBuffer() const {
-	assert(m_IsFrameStarted && "Cannont get command buffer when frame is not in progress");
+	SASSERT_MSG(m_IsFrameStarted, "Cannot get command buffer when frame is not in progress");
 	return m_CommandBuffers[m_CurrentFrameIndex];
 }
 
 int Renderer::getFrameIndex() const {
-	assert(m_IsFrameStarted && "Cannot get frame index when frame is not in progress!");
+	SASSERT_MSG(m_IsFrameStarted, "Cannot get frame index when frame is not in progress");
 	return m_CurrentFrameIndex;
 }
 
 VkCommandBuffer Renderer::beginFrame() {
-	assert(!m_IsFrameStarted && "Cannot call beginFrame while already in progress");
+	SASSERT_MSG(!m_IsFrameStarted, "Cannot call beginFrame while frame is already in progress");
 
 	VkResult result = m_Swapchain->acquireNextImage(&m_CurrentImageIndex);
 
@@ -55,7 +56,7 @@ VkCommandBuffer Renderer::beginFrame() {
 }
 
 void Renderer::endFrame() {
-	assert(m_IsFrameStarted && "Cannot call endFrame while frame is not in progress!");
+	SASSERT_MSG(m_IsFrameStarted, "Cannot call endFrame while frame is not in progress");
 
 	VkCommandBuffer commandBuffer = getCurrentCommandBuffer();
 
@@ -77,8 +78,8 @@ void Renderer::endFrame() {
 }
 
 void Renderer::beginSwapchainRenderPass(VkCommandBuffer commandBuffer) {
-	assert(m_IsFrameStarted && "Cannot call beginSwapchainRenderPass if frame is not in progress!");
-	assert(commandBuffer == getCurrentCommandBuffer() && "Cannot begin render pass on command buffer from a different frame!");
+	SASSERT_MSG(m_IsFrameStarted, "Cannot call beginSwapchainRenderPass if frame is not in progress");
+	SASSERT_MSG(commandBuffer == getCurrentCommandBuffer(), "Cannot begin render pass on command buffer from a different frame");
 
 	std::array<VkClearValue, 2> clearValues{};
 	clearValues[0].color = { 0.01f, 0.01f, 0.01f, 1.0f };
@@ -112,8 +113,8 @@ void Renderer::beginSwapchainRenderPass(VkCommandBuffer commandBuffer) {
 }
 
 void Renderer::endSwapchainRenderPass(VkCommandBuffer commandBuffer) {
-	assert(m_IsFrameStarted && "Cannot call endSwapchainRenderPass if frame is not in progress!");
-	assert(commandBuffer == getCurrentCommandBuffer() && "Cannot end render pass on command buffer from a different frame!");
+	SASSERT_MSG(m_IsFrameStarted, "Cannot call endSwapchainRenderPass if frame is not in progress");
+	SASSERT_MSG(commandBuffer == getCurrentCommandBuffer(), "Cannot end render pass on command buffer from a different frame");
 
 	vkCmdEndRenderPass(commandBuffer);
 }

@@ -1,9 +1,10 @@
 #include "Camera.hpp"
 
+#include "Core/Asserts.hpp"
+
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <cassert>
 #include <limits>
 
 namespace stl {
@@ -14,7 +15,7 @@ void Camera::setOrthographicProjection(float left, float right, float top, float
 }
 
 void Camera::setPerspectiveProjection(float fovy, float aspect, float near, float far) {
-	assert(glm::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f);
+	SASSERT(glm::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f);
 
 	m_ProjectionMatrix = glm::perspective(fovy, aspect, near, far);
 	m_ProjectionMatrix[1][1] *= -1; // y axis points down in vulkan
@@ -26,11 +27,14 @@ void Camera::setViewDirection(const glm::vec3& position, const glm::vec3& direct
 }
 
 void Camera::setViewTarget(const glm::vec3& position, const glm::vec3& target, const glm::vec3& up) {
+	m_Position = position;
 	m_ViewMatrix = glm::lookAt(position, target, up);
 	m_InverseViewMatrix = glm::inverse(m_ViewMatrix);
 }
 
 void Camera::setViewYXZ(const glm::vec3& position, const glm::vec3& rotation) {
+	m_Position = position;
+
 	const float c3 = glm::cos(rotation.z);
 	const float s3 = glm::sin(rotation.z);
 	const float c2 = glm::cos(rotation.x);

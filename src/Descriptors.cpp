@@ -1,6 +1,7 @@
 #include "renderer/wrapper/Descriptors.hpp"
 
-#include <cassert>
+#include "Core/Asserts.hpp"
+
 #include <stdexcept>
 
 namespace stl {
@@ -11,7 +12,7 @@ DescriptorSetLayout::Builder::Builder(Device& device)
 }
 
 DescriptorSetLayout::Builder& DescriptorSetLayout::Builder::addBinding(uint32_t binding, VkDescriptorType descriptorType, VkShaderStageFlags stageFlags, uint32_t count) {
-	assert(m_Bindings.count(binding) == 0 && "Binding is already in use");
+	SASSERT_MSG(m_Bindings.count(binding) == 0, "Binding is already in use");
 
 	VkDescriptorSetLayoutBinding layoutBinding{};
 	layoutBinding.binding = binding;
@@ -33,7 +34,7 @@ DescriptorSetLayout::DescriptorSetLayout(Device& device, std::unordered_map<uint
 	: m_Device{ device }, m_Bindings{ bindings } {
 	std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings{};
 
-	for (auto kv : m_Bindings) {
+	for (auto& kv : m_Bindings) {
 		setLayoutBindings.push_back(kv.second);
 	}
 
@@ -121,11 +122,11 @@ DescriptorWriter::DescriptorWriter(DescriptorSetLayout& setLayout, DescriptorPoo
 }
 
 DescriptorWriter& DescriptorWriter::writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo) {
-	assert(m_SetLayout.m_Bindings.count(binding) == 1 && "Layout does not contain specified binding");
+	SASSERT_MSG(m_SetLayout.m_Bindings.count(binding) == 1, "Layout does not contain specified binding");
 
 	auto& bindingDescription = m_SetLayout.m_Bindings[binding];
 
-	assert(bindingDescription.descriptorCount == 1 && "Binding single descriptor info, but binding expects multiple");
+	SASSERT_MSG(bindingDescription.descriptorCount == 1, "Binding single descriptor info, but binding expects multiple");
 
 	VkWriteDescriptorSet write{};
 	write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -140,11 +141,11 @@ DescriptorWriter& DescriptorWriter::writeBuffer(uint32_t binding, VkDescriptorBu
 }
 
 DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo) {
-	assert(m_SetLayout.m_Bindings.count(binding) == 1 && "Layout does not contain specified binding");
+	SASSERT_MSG(m_SetLayout.m_Bindings.count(binding) == 1, "Layout does not contain specified binding");
 
 	auto& bindingDescription = m_SetLayout.m_Bindings[binding];
 
-	assert(bindingDescription.descriptorCount == 1 && "Binding single descriptor info, but binding expects multiple");
+	SASSERT_MSG(bindingDescription.descriptorCount == 1, "Binding singe descriptor info, but binding expects multiple");
 
 	VkWriteDescriptorSet write{};
 	write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

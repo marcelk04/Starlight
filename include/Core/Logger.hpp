@@ -16,31 +16,31 @@
 #endif
 
 #if LOG_ENABLE_FATAL == 1
-#define SFATAL(...) stl::Logger::get().print(stl::LogLevel::Fatal, __VA_ARGS__);
+#define SFATAL(...) stl::Logger::get().print(stl::LogLevel::Fatal, __VA_ARGS__)
 #else
 #define SFATAL(...)
 #endif
 
 #if LOG_ENABLE_ERROR == 1
-#define SERROR(...) stl::Logger::get().print(stl::LogLevel::Error, __VA_ARGS__);
+#define SERROR(...) stl::Logger::get().print(stl::LogLevel::Error, __VA_ARGS__)
 #else
 #define SERROR(...)
 #endif
 
 #if LOG_ENABLE_WARN == 1
-#define SWARN(...) stl::Logger::get().print(stl::LogLevel::Warn, __VA_ARGS__);
+#define SWARN(...) stl::Logger::get().print(stl::LogLevel::Warn, __VA_ARGS__)
 #else
 #define SWARN(...)
 #endif
 
 #if LOG_ENABLE_INFO == 1
-#define SINFO(...) stl::Logger::get().print(stl::LogLevel::Info, __VA_ARGS__);
+#define SINFO(...) stl::Logger::get().print(stl::LogLevel::Info, __VA_ARGS__)
 #else
 #define SINFO(...)
 #endif
 
 #if LOG_ENABLE_DEBUG == 1
-#define SDEBUG(...) stl::Logger::get().print(stl::LogLevel::Debug, __VA_ARGS__);
+#define SDEBUG(...) stl::Logger::get().print(stl::LogLevel::Debug, __VA_ARGS__)
 #else
 #define SDEBUG(...)
 #endif

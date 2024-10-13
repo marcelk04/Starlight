@@ -1,6 +1,7 @@
 #include "renderer/rendersystems/PointLightSystem.hpp"
 
-#include <cassert>
+#include "Core/Asserts.hpp"
+
 #include <stdexcept>
 #include <array>
 #include <map>
@@ -83,7 +84,7 @@ void PointLightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayou
 }
 
 void PointLightSystem::createPipeline(VkRenderPass renderPass) {
-	assert(m_PipelineLayout != nullptr && "Cannot create pipeline before pipeline layout!");
+	SASSERT_MSG(m_PipelineLayout != nullptr, "Cannot create pipeline before pipeline layout");
 
 	PipelineConfigInfo pipelineConfig{};
 	Pipeline::defaultPipelineConfigInfo(pipelineConfig);

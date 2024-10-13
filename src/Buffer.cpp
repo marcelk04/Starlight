@@ -1,6 +1,7 @@
 #include "renderer/wrapper/Buffer.hpp"
 
-#include <cassert>
+#include "Core/Asserts.hpp"
+
 #include <cstring>
 
 namespace stl {
@@ -21,7 +22,7 @@ Buffer::~Buffer() {
 }
 
 VkResult Buffer::map(VkDeviceSize size, VkDeviceSize offset) {
-	assert(m_Buffer && m_Memory && "Called map on buffer before create");
+	SASSERT_MSG(m_Buffer && m_Memory, "Called map on buffer before create");
 
 	return vkMapMemory(m_Device.getDevice(), m_Memory, offset, size, 0, &m_Mapped);
 }
@@ -34,7 +35,7 @@ void Buffer::unmap() {
 }
 
 void Buffer::writeToBuffer(void* data, VkDeviceSize size, VkDeviceSize offset) {
-	assert(m_Mapped && "Cannot copy to unmapped buffer");
+	SASSERT_MSG(m_Mapped, "Cannot copy to unmapped buffer");
 
 	if (size == VK_WHOLE_SIZE) {
 		memcpy(m_Mapped, data, m_BufferSize);
