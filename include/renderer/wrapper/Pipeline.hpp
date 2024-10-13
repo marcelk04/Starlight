@@ -43,10 +43,7 @@ public:
 	void bind(VkCommandBuffer commandBuffer) const;
 
 private:
-	static std::vector<char> readFile(const std::string& filepath);
-
 	void createGraphicsPipeline(const std::string& vsFilepath, const std::string& fsFilepath, const PipelineConfigInfo& configInfo);
-
 	void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
 
 private:

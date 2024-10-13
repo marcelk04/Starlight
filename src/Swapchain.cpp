@@ -1,9 +1,10 @@
 #include "renderer/wrapper/Swapchain.hpp"
 
+#include "Core/Logger.hpp"
+
 #include <array>
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
 #include <limits>
 #include <set>
 #include <stdexcept>
@@ -359,7 +360,7 @@ VkSurfaceFormatKHR Swapchain::chooseSwapSurfaceFormat(const std::vector<VkSurfac
 VkPresentModeKHR Swapchain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const {
 	for (const auto& availablePresentMode : availablePresentModes) {
 		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-			std::cout << "Present mode: Mailbox\n";
+			SINFO("Present mode: Mailbox");
 
 			return availablePresentMode;
 		}
@@ -375,7 +376,7 @@ VkPresentModeKHR Swapchain::chooseSwapPresentMode(const std::vector<VkPresentMod
 	}
 	*/
 
-	std::cout << "Present mode: V-Sync\n";
+	SINFO("Present move: V-Sync");
 
 	return VK_PRESENT_MODE_FIFO_KHR;
 }

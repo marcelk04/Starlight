@@ -1,6 +1,7 @@
 #include "renderer/wrapper/Pipeline.hpp"
 
 #include "renderer/Model.hpp"
+#include "Core/Common.hpp"
 
 #include <stdexcept>
 #include <fstream>
@@ -109,31 +110,12 @@ void Pipeline::bind(VkCommandBuffer commandBuffer) const {
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline);
 }
 
-std::vector<char> Pipeline::readFile(const std::string& filepath) {
-	std::ifstream file(std::filesystem::absolute(filepath), std::ios::ate | std::ios::binary);
-
-	if (!file.is_open()) {
-		throw std::runtime_error("Failed to open file: " + filepath);
-	}
-
-	size_t fileSize = static_cast<size_t>(file.tellg());
-
-	std::vector<char> buffer(fileSize);
-
-	file.seekg(0);
-	file.read(buffer.data(), fileSize);
-
-	file.close();
-
-	return buffer;
-}
-
 void Pipeline::createGraphicsPipeline(const std::string& vsFilepath, const std::string& fsFilepath, const PipelineConfigInfo& configInfo) {
 	assert(configInfo.pipelineLayout != VK_NULL_HANDLE && "Cannot create graphics pipeline: no pipeline layout provided in configInfo!");
 	assert(configInfo.renderPass != VK_NULL_HANDLE && "Cannot create graphics pipeline: no render pass provided in configInfo!");
 
-	auto vertCode = readFile(vsFilepath);
-	auto fragCode = readFile(fsFilepath);
+	auto vertCode = Common::readFile(vsFilepath);
+	auto fragCode = Common::readFile(fsFilepath);
 
 	createShaderModule(vertCode, &m_VertShaderModule);
 	createShaderModule(fragCode, &m_FragShaderModule);

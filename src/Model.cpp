@@ -1,6 +1,6 @@
 #include "renderer/Model.hpp"
 
-#include "Utils.hpp"
+#include "Core/Common.hpp"
 
 #include <tiny_obj_loader.h>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -17,7 +17,7 @@ template <>
 struct hash<stl::Model::Vertex> {
 	size_t operator()(const stl::Model::Vertex& vertex) const {
 		size_t seed = 0;
-		stl::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
+		stl::Common::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
 		return seed;
 	}
 };

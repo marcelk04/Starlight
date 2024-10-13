@@ -1,5 +1,6 @@
 #include "FirstApp.hpp"
 
+#include "Core/Logger.hpp"
 #include "input/Input.hpp"
 #include "renderer/wrapper/Buffer.hpp"
 #include "Camera.hpp"
@@ -7,7 +8,6 @@
 
 #include <stdexcept>
 #include <array>
-#include <iostream>
 #include <chrono>
 
 namespace stl {

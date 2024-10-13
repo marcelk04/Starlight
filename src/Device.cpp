@@ -1,7 +1,8 @@
 #include "renderer/wrapper/Device.hpp"
 
+#include "Core/Logger.hpp"
+
 #include <cstring>
-#include <iostream>
 #include <set>
 #include <unordered_set>
 
@@ -268,7 +269,7 @@ void Device::pickPhysicalDevice() {
 		throw std::runtime_error("Failed to find GPUs with Vulkan support!");
 	}
 
-	std::cout << "Device count: " << deviceCount << '\n';
+	SINFO("Device count: ", deviceCount);
 
 	std::vector<VkPhysicalDevice> devices(deviceCount);
 	vkEnumeratePhysicalDevices(m_Instance, &deviceCount, devices.data());
@@ -286,7 +287,7 @@ void Device::pickPhysicalDevice() {
 
 	vkGetPhysicalDeviceProperties(m_PhysicalDevice, &p_Properties);
 
-	std::cout << "Physical device: " << p_Properties.deviceName << '\n';
+	SINFO("Physical device: ", p_Properties.deviceName);
 }
 
 void Device::createLogicalDevice() {

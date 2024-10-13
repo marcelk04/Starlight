@@ -1,5 +1,7 @@
 #include "FirstApp.hpp"
 
+#include "Core/Logger.hpp"
+
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
@@ -14,7 +16,7 @@ int main() {
     try {
         app.run();
     } catch (const std::exception& e) {
-        std::cerr << e.what() << '\n';
+        SFATAL(e.what());
         return EXIT_FAILURE;
     }
 
