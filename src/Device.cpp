@@ -8,35 +8,8 @@
 
 namespace stl {
 
-// local callback functions
-static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
-	std::cerr << "Validation layer: " << pCallbackData->pMessage << std::endl;
-	return VK_FALSE;
-}
-
-VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
-	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-
-	if (func != nullptr) {
-		return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-	} else {
-		return VK_ERROR_EXTENSION_NOT_PRESENT;
-	}
-}
-
-void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
-	auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-
-	if (func != nullptr) {
-		func(instance, debugMessenger, pAllocator);
-	}
-}
-
-// class member functions
 Device::Device(Window& window)
-	: m_Window(window) {
-	createInstance();
-	setupDebugMessenger();
+	: m_Instance{}, m_Window{ window } {
 	createSurface();
 	pickPhysicalDevice();
 	createLogicalDevice();
@@ -47,12 +20,7 @@ Device::~Device() {
 	vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
 	vkDestroyDevice(m_Device, nullptr);
 
-	if (p_EnableValidationLayers) {
-		DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
-	}
-
-	vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
-	vkDestroyInstance(m_Instance, nullptr);
+	vkDestroySurfaceKHR(m_Instance.getInstance(), m_Surface, nullptr);
 }
 
 SwapchainSupportDetails Device::getSwapchainSupport() {
@@ -204,66 +172,14 @@ void Device::createImageWithInfo(const VkImageCreateInfo &imageInfo, VkMemoryPro
 	}
 }
 
-void Device::createInstance() {
-	if (p_EnableValidationLayers && !checkValidationLayerSupport()) {
-		throw std::runtime_error("Validation layers requested, but not available!");
-	}
-
-	VkApplicationInfo appInfo = {};
-	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = "Starlight Engine";
-	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.pEngineName = "No Engine";
-	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.apiVersion = VK_API_VERSION_1_0;
-
-	VkInstanceCreateInfo createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	createInfo.pApplicationInfo = &appInfo;
-
-	auto extensions = getRequiredExtensions();
-	createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-	createInfo.ppEnabledExtensionNames = extensions.data();
-
-	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
-
-	if (p_EnableValidationLayers) {
-		createInfo.enabledLayerCount = static_cast<uint32_t>(m_ValidationLayers.size());
-		createInfo.ppEnabledLayerNames = m_ValidationLayers.data();
-
-		populateDebugMessengerCreateInfo(debugCreateInfo);
-		createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
-	} else {
-		createInfo.enabledLayerCount = 0;
-		createInfo.pNext = nullptr;
-	}
-
-	if (vkCreateInstance(&createInfo, nullptr, &m_Instance) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to create instance!");
-	}
-
-	hasGLFWRequiredInstanceExtensions();
-}
-
-void Device::setupDebugMessenger() {
-	if (!p_EnableValidationLayers) return;
-
-	VkDebugUtilsMessengerCreateInfoEXT createInfo;
-	populateDebugMessengerCreateInfo(createInfo);
-
-	if (CreateDebugUtilsMessengerEXT(m_Instance, &createInfo, nullptr, &m_DebugMessenger) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to setup debug messenger!");
-	}
-}
-
 void Device::createSurface() {
-	m_Window.createWindowSurface(m_Instance, &m_Surface);
+	m_Window.createWindowSurface(m_Instance.getInstance(), &m_Surface);
 }
 
 void Device::pickPhysicalDevice() {
 	uint32_t deviceCount = 0;
 
-	vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr);
+	vkEnumeratePhysicalDevices(m_Instance.getInstance(), &deviceCount, nullptr);
 
 	if (deviceCount == 0) {
 		throw std::runtime_error("Failed to find GPUs with Vulkan support!");
@@ -272,7 +188,7 @@ void Device::pickPhysicalDevice() {
 	SINFO("Device count: ", deviceCount);
 
 	std::vector<VkPhysicalDevice> devices(deviceCount);
-	vkEnumeratePhysicalDevices(m_Instance, &deviceCount, devices.data());
+	vkEnumeratePhysicalDevices(m_Instance.getInstance(), &deviceCount, devices.data());
 
 	for (const auto& device : devices) {
 		if (isDeviceSuitable(device)) {
@@ -318,13 +234,7 @@ void Device::createLogicalDevice() {
 	createInfo.pEnabledFeatures = &deviceFeatures;
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(m_DeviceExtensions.size());
 	createInfo.ppEnabledExtensionNames = m_DeviceExtensions.data();
-
-	if (p_EnableValidationLayers) {
-		createInfo.enabledLayerCount = static_cast<uint32_t>(m_ValidationLayers.size());
-		createInfo.ppEnabledLayerNames = m_ValidationLayers.data();
-	} else {
-		createInfo.enabledLayerCount = 0;
-	}
+	createInfo.enabledLayerCount = 0; // could enable validation layers, ignored in up-to-date versions
 
 	if (vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to create logical device!");
@@ -364,45 +274,6 @@ bool Device::isDeviceSuitable(VkPhysicalDevice device) const {
 	return indices.isComplete() && extensionsSupported && swapchainAdequate && supportedFeatures.samplerAnisotropy;
 }
 
-std::vector<const char *> Device::getRequiredExtensions() const {
-	uint32_t glfwExtensionCount;
-	const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-	std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-
-	if (p_EnableValidationLayers) {
-		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-	}
-
-	return extensions;
-}
-
-bool Device::checkValidationLayerSupport() const {
-	uint32_t layerCount;
-
-	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-
-	std::vector<VkLayerProperties> availableLayers(layerCount);
-	vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-	for (const char* layerName : m_ValidationLayers) {
-		bool layerFound = false;
-
-		for (const auto& layerProperties : availableLayers) {
-			if (std::strcmp(layerName, layerProperties.layerName) == 0) {
-				layerFound = true;
-				break;
-			}
-		}
-
-		if (!layerFound) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
 QueueFamilyIndices Device::findQueueFamilies(VkPhysicalDevice device) const {
 	QueueFamilyIndices indices;
 
@@ -429,37 +300,6 @@ QueueFamilyIndices Device::findQueueFamilies(VkPhysicalDevice device) const {
 	}
 
 	return indices;
-}
-
-void Device::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo) const {
-	createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-	createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-	                             VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-	createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-	                         VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-	                         VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-	createInfo.pfnUserCallback = debugCallback;
-	createInfo.pUserData = nullptr;
-}
-
-void Device::hasGLFWRequiredInstanceExtensions() const {
-	uint32_t extensionCount = 0;
-	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-
-	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
-
-	auto glfwExtensions = getRequiredExtensions();
-	std::set<std::string> requiredExtensions(glfwExtensions.begin(), glfwExtensions.end());
-
-	for (const auto& extension : availableExtensions) {
-		requiredExtensions.erase(std::string(extension.extensionName));
-	}
-
-	if (!requiredExtensions.empty()) {
-		throw std::runtime_error("Missing required glfw extension!");
-	}
 }
 
 bool Device::checkDeviceExtensionSupport(VkPhysicalDevice device) const {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "renderer/wrapper/Window.hpp"
+#include "renderer/wrapper/Instance.hpp"
 
 #include <string>
 #include <vector>
@@ -54,34 +55,21 @@ public:
 	void createImageWithInfo(const VkImageCreateInfo& imageInfo, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) const;
 
 private:
-	void createInstance();
-	void setupDebugMessenger();
 	void createSurface();
 	void pickPhysicalDevice();
 	void createLogicalDevice();
 	void createCommandPool();
 
 	bool isDeviceSuitable(VkPhysicalDevice device) const;
-	std::vector<const char*> getRequiredExtensions() const;
-	bool checkValidationLayerSupport() const;
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) const;
-	void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) const;
-	void hasGLFWRequiredInstanceExtensions() const;
 	bool checkDeviceExtensionSupport(VkPhysicalDevice) const;
 	SwapchainSupportDetails querySwapchainSupport(VkPhysicalDevice device) const;
 
 public:
 	VkPhysicalDeviceProperties p_Properties;
 
-#ifdef NDEBUG
-	const bool p_EnableValidationLayers = false;
-#else
-	const bool p_EnableValidationLayers = true;
-#endif
-
 private:
-	VkInstance m_Instance;
-	VkDebugUtilsMessengerEXT m_DebugMessenger;
+	Instance m_Instance;
 	VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
 	VkCommandPool m_CommandPool;
 
@@ -92,7 +80,6 @@ private:
 	VkQueue m_GraphicsQueue;
 	VkQueue m_PresentQueue;
 
-	const std::vector<const char*> m_ValidationLayers = { "VK_LAYER_KHRONOS_validation" };
 	const std::vector<const char*> m_DeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 };
 
