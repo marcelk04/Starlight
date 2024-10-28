@@ -56,6 +56,9 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 // class member functions
 
+/**
+ * Creates a new Vulkan instance.
+ */
 Instance::Instance() {
 	createInstance();
 	setupDebugMessenger();
@@ -69,6 +72,11 @@ Instance::~Instance() {
 	vkDestroyInstance(m_Instance, nullptr);
 }
 
+/*
+ * Function used internally to create a Vulkan instance.
+ * If enabled and present, validation layers are also added.
+ * Also checks if the required extensions are present.
+ */
 void Instance::createInstance() {
 	if (m_EnableValidationLayers && !supportsValidationLayers()) {
 		SWARN("Validation layers requested, but not available!");
@@ -117,6 +125,9 @@ void Instance::createInstance() {
 	}
 }
 
+/**
+ * Sets up a debug messenger.
+ */
 void Instance::setupDebugMessenger() {
 	if (!m_EnableValidationLayers) return;
 
@@ -128,6 +139,11 @@ void Instance::setupDebugMessenger() {
 	}
 }
 
+/**
+ * Populates the create info for a debug messenger with a default configuration.
+ *
+ * @param[in,out] createInfo the create info to be filled.
+ */
 void Instance::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) const {
 	createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -140,6 +156,12 @@ void Instance::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoE
 	createInfo.pUserData = nullptr;
 }
 
+/**
+ * Returns the extensions required by the engine.
+ * This includes the glfw extensions and the debug utils extension.
+ *
+ * @return a vector of the names of the required extensions.
+ */
 std::vector<const char*> Instance::getRequiredExtensions() const {
 	uint32_t glfwExtensionCount;
 	const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -153,6 +175,11 @@ std::vector<const char*> Instance::getRequiredExtensions() const {
 	return extensions;
 }
 
+/**
+ * Checks if all validation layers specified in m_ValidationLayers are present.
+ *
+ * @return true, if all validation layers are found.
+ */
 bool Instance::supportsValidationLayers() const {
 	uint32_t layerCount;
 
@@ -181,6 +208,13 @@ bool Instance::supportsValidationLayers() const {
 	return success;
 }
 
+/**
+ * Checks if all required extensions are present.
+ *
+ * @see getRequiredExtensions()
+ *
+ * @return true, if all extensions are found.
+ */
 bool Instance::supportsRequiredExtensions() const {
 	uint32_t extensionCount = 0;
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
