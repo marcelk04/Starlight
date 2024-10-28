@@ -2,27 +2,14 @@
 
 #include "renderer/wrapper/Window.hpp"
 #include "renderer/wrapper/Instance.hpp"
+#include "renderer/wrapper/PhysicalDevice.hpp"
 
 #include <string>
 #include <vector>
 #include <optional>
+#include <memory>
 
 namespace stl {
-
-struct SwapchainSupportDetails {
-	VkSurfaceCapabilitiesKHR capabilities;
-	std::vector<VkSurfaceFormatKHR> formats;
-	std::vector<VkPresentModeKHR> presentModes;
-};
-
-struct QueueFamilyIndices {
-	std::optional<uint32_t> graphicsFamily;
-	std::optional<uint32_t> presentFamily;
-
-	bool isComplete() const {
-		return graphicsFamily.has_value() && presentFamily.has_value();
-	}
-};
 
 class Device {
 public:
@@ -60,17 +47,12 @@ private:
 	void createLogicalDevice();
 	void createCommandPool();
 
-	bool isDeviceSuitable(VkPhysicalDevice device) const;
-	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) const;
-	bool checkDeviceExtensionSupport(VkPhysicalDevice) const;
-	SwapchainSupportDetails querySwapchainSupport(VkPhysicalDevice device) const;
-
 public:
 	VkPhysicalDeviceProperties p_Properties;
 
 private:
 	Instance m_Instance;
-	VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
+	std::shared_ptr<PhysicalDevice> m_PhysicalDevice;
 	VkCommandPool m_CommandPool;
 
 	Window& m_Window;
