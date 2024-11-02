@@ -64,6 +64,12 @@ Instance::Instance() {
 	setupDebugMessenger();
 }
 
+Instance::Instance(Instance&& other) noexcept {
+	m_Instance = std::exchange(other.m_Instance, VK_NULL_HANDLE);
+	m_DebugMessenger = std::exchange(other.m_DebugMessenger, VK_NULL_HANDLE);
+	m_EnableValidationLayers = std::exchange(other.m_EnableValidationLayers, false);
+}
+
 Instance::~Instance() {
 	if (m_EnableValidationLayers) {
 		DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
@@ -117,7 +123,7 @@ void Instance::createInstance() {
 		SINFO("Validation layers are disabled");
 
 		createInfo.enabledLayerCount = 0;
-		createInfo.pNext = nullptr;
+		createInfo.ppEnabledLayerNames = nullptr;
 	}
 
 	if (vkCreateInstance(&createInfo, nullptr, &m_Instance) != VK_SUCCESS) {
@@ -181,31 +187,7 @@ std::vector<const char*> Instance::getRequiredExtensions() const {
  * @return true, if all validation layers are found.
  */
 bool Instance::supportsValidationLayers() const {
-	uint32_t layerCount;
-
-	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-
-	std::vector<VkLayerProperties> availableLayers(layerCount);
-	vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-	bool success = true;
-	for (const char* layerName : m_ValidationLayers) {
-		bool layerFound = false;
-
-		for (const auto& layerProperties : availableLayers) {
-			if (std::strcmp(layerName, layerProperties.layerName) == 0) {
-				layerFound = true;
-				break;
-			}
-		}
-
-		if (!layerFound) {
-			SWARN("Missing validation layer: ", layerName);
-			success = false;
-		}
-	}
-
-	return success;
+	return supportsLayers(m_ValidationLayers);
 }
 
 /**
@@ -216,14 +198,37 @@ bool Instance::supportsValidationLayers() const {
  * @return true, if all extensions are found.
  */
 bool Instance::supportsRequiredExtensions() const {
+	return supportsExtensions(getRequiredExtensions());
+}
+
+bool Instance::supportsLayers(const std::vector<const char*>& layers) {
+	uint32_t layerCount;
+	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+	std::vector<VkLayerProperties> availableLayers(layerCount);
+	vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+	std::set<std::string> requiredLayers(layers.begin(), layers.end());
+
+	for (const auto& layer : availableLayers) {
+		requiredLayers.erase(std::string(layer.layerName));
+	}
+
+	for (const auto& layer : requiredLayers) {
+		SWARN("Missing layer: ", layer);
+	}
+
+	return requiredLayers.empty();
+}
+
+bool Instance::supportsExtensions(const std::vector<const char*>& extensions) {
 	uint32_t extensionCount = 0;
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
 
 	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
 
-	auto glfwExtensions = getRequiredExtensions();
-	std::set<std::string> requiredExtensions(glfwExtensions.begin(), glfwExtensions.end());
+	std::set<std::string> requiredExtensions(extensions.begin(), extensions.end());
 
 	for (const auto& extension : availableExtensions) {
 		requiredExtensions.erase(std::string(extension.extensionName));

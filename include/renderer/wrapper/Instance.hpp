@@ -9,7 +9,12 @@ namespace stl {
 class Instance {
 public:
 	Instance();
+	Instance(const Instance&) = delete;
+	Instance(Instance&&) noexcept;
 	~Instance();
+
+	Instance& operator=(const Instance&) = delete;
+	Instance& operator=(Instance&&) = default;
 
 	VkInstance getInstance() const { return m_Instance; }
 
@@ -21,6 +26,9 @@ private:
 	std::vector<const char*> getRequiredExtensions() const;
 	bool supportsValidationLayers() const;
 	bool supportsRequiredExtensions() const;
+
+	static bool supportsLayers(const std::vector<const char*>& layers);
+	static bool supportsExtensions(const std::vector<const char*>& extensions);
 
 private:
 	VkInstance m_Instance;

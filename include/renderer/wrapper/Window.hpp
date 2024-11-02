@@ -10,10 +10,12 @@ namespace stl {
 class Window {
 public:
 	Window(int width, int height, const std::string& name);
+	Window(const Window&) = delete;
+	Window(Window&&) = delete;
 	~Window();
 
-	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
+	Window& operator=(Window&&) = delete;
 
 	VkExtent2D getExtent() const { return { static_cast<uint32_t>(m_Width), static_cast<uint32_t>(m_Height) }; }
 	bool shouldClose() const;
