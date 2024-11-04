@@ -1,6 +1,11 @@
 #pragma once
 
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+
 #include <iostream>
+#include <vector>
 
 // Always enable fatal and error log messages
 #define LOG_ENABLE_FATAL 1
@@ -89,3 +94,35 @@ private:
 };
 
 }
+
+// custom print functions
+
+template<typename T>
+inline std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
+	os << "{ ";
+
+	for (size_t i = 0; i < vec.size(); i++) {
+		os << vec[i];
+
+		if (i < vec.size() - 1) {
+			os << ", ";
+		}
+	}
+
+	os << " }";
+
+	return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const glm::vec2& vec) {
+	return os << '(' << vec.x << ", " << vec.y << ')';
+}
+
+inline std::ostream& operator<<(std::ostream& os, const glm::vec3& vec) {
+	return os << '(' << vec.x << ", " << vec.y << ", " << vec.z << ')';
+}
+
+inline std::ostream& operator<<(std::ostream& os, const glm::vec4& vec) {
+	return os << '(' << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << ')';
+}
+
