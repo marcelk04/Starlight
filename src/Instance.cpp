@@ -6,6 +6,7 @@
 
 #include <stdexcept>
 #include <set>
+#include <utility>
 #include <string>
 
 namespace stl {
@@ -87,6 +88,8 @@ void Instance::createInstance() {
 	if (m_EnableValidationLayers && !supportsValidationLayers()) {
 		SWARN("Validation layers requested, but not available!");
 		SWARN("Disabling validation layers!");
+
+		m_EnableValidationLayers = false;
 	}
 
 	if (!supportsRequiredExtensions()) {

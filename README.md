@@ -19,7 +19,7 @@ Make sure you have the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home) installe
 Install the Vulkan dependencies using:
 
 ```bash
-sudo apt install vulkan-tools libvulkan-dev vulkan-validationlayers-dev
+sudo apt install vulkan-tools libvulkan-dev vulkan-validationlayers glslc
 ```
 
 You will also need to install the GLFW dependencies:
@@ -27,8 +27,6 @@ You will also need to install the GLFW dependencies:
 ```bash
 sudo apt install libwayland-dev libxkbcommon-dev xorg-dev
 ```
-
-To compile the shaders, you will need to install glslc. Since it does not seem to be available as a package, I would recommend following the [Vulkan Tutorial](https://vulkan-tutorial.com/Development_environment#page_Shader-Compiler) or getting the library from another source.
 
 ### Linux Fedora
 
