@@ -52,8 +52,8 @@ void FirstApp::run() {
 			.build(globalDescriptorSets[i]);
 	}
 
-	SimpleRenderSystem simpleRenderSystem{ m_Device, m_Renderer.getSwapchainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-	PointLightSystem pointLightSystem{ m_Device, m_Renderer.getSwapchainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+	GaussianSystem gaussianSystem{ m_Device, m_Renderer.getSwapchainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+
 	Camera camera{};
 
 	GameObject viewerObject = GameObject::createGameObject();
@@ -84,15 +84,13 @@ void FirstApp::run() {
 			ubo.projection = camera.getProjection();
 			ubo.view = camera.getView();
 			ubo.inverseView = camera.getInverseView();
-			pointLightSystem.update(frameInfo, ubo);
 			uboBuffers[frameIndex]->writeToBuffer(&ubo);
 			uboBuffers[frameIndex]->flush();
 
 			// render
 			m_Renderer.beginSwapchainRenderPass(commandBuffer);
 
-			simpleRenderSystem.renderGameObjects(frameInfo);
-			pointLightSystem.render(frameInfo);
+			gaussianSystem.render(frameInfo, *m_PointCloud);
 
 			m_Renderer.endSwapchainRenderPass(commandBuffer);
 			m_Renderer.endFrame();
@@ -103,49 +101,9 @@ void FirstApp::run() {
 }
 
 void FirstApp::loadGameObjects() {
-	std::shared_ptr<Model> flatVaseModel = Model::createModelFromFile(m_Device, "assets/models/flat_vase.obj");
-
-	GameObject flatVase = GameObject::createGameObject();
-	flatVase.p_Model = flatVaseModel;
-	flatVase.p_Transform.translation = { -0.5f, -0.5f, 0.0f };
-	flatVase.p_Transform.scale = { 3.0f, -1.5f, 3.0f }; // negative y scale bc y axis of model is flipped
-	m_GameObjects.emplace(flatVase.getId(), std::move(flatVase));
-
-	std::shared_ptr<Model> smoothVaseModel = Model::createModelFromFile(m_Device, "assets/models/smooth_vase.obj");
-
-	GameObject smoothVase = GameObject::createGameObject();
-	smoothVase.p_Model = smoothVaseModel;
-	smoothVase.p_Transform.translation = { 0.5f, -0.5f, 0.0f };
-	smoothVase.p_Transform.scale = { 3.0f, -1.5f, 3.0f };
-	m_GameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
-
-	std::shared_ptr<Model> floorModel = Model::createModelFromFile(m_Device, "assets/models/quad.obj");
-
-	GameObject floor = GameObject::createGameObject();
-	floor.p_Model = floorModel;
-	floor.p_Transform.translation = { 0.0f, -0.5f, 0.0f };
-	floor.p_Transform.scale = { 3.0f, 1.0f, 3.0f };
-	m_GameObjects.emplace(floor.getId(), std::move(floor));
-
-	GameObject pointLight = GameObject::createPointLight(0.2f);
-	m_GameObjects.emplace(pointLight.getId(), std::move(pointLight));
-
-	std::vector<glm::vec3> lightColors{
-		{1.f, .1f, .1f},
-		{.1f, .1f, 1.f},
-		{.1f, 1.f, .1f},
-		{1.f, 1.f, .1f},
-		{.1f, 1.f, 1.f},
-		{1.f, 1.f, 1.f}
-	};
-
-	for (int i = 0; i < lightColors.size(); i++) {
-		GameObject light = GameObject::createPointLight(0.2f);
-		light.p_Color = lightColors[i];
-		glm::mat4 rotateLight = glm::rotate(glm::mat4(1.0f), (i * glm::two_pi<float>()) / lightColors.size(), { 0.0f, 1.0f, 0.0f });
-		light.p_Transform.translation = glm::vec3(rotateLight * glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-		m_GameObjects.emplace(light.getId(), std::move(light));
-	}
+	std::shared_ptr<GSSplats> splats = GSPointCloud::loadFromSplatsPly("assets/point_clouds/rotation_test.ply");
+	SASSERT_MSG(splats->valid, "Point cloud has to be valid!");
+	m_PointCloud = std::make_shared<GSPointCloud>(m_Device, splats);
 }
 
 }

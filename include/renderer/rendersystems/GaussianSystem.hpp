@@ -1,0 +1,43 @@
+#pragma once
+
+#include "GaussianSplatting/SplatData.hpp"
+#include "GaussianSplatting/GSPointCloud.hpp"
+#include "renderer/wrapper/Pipeline.hpp"
+#include "renderer/wrapper/Device.hpp"
+#include "renderer/Model.hpp"
+#include "renderer/FrameInfo.hpp"
+#include "GameObject.hpp"
+#include "Camera.hpp"
+
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
+
+#include <vector>
+#include <memory>
+
+namespace stl {
+
+class GaussianSystem {
+public:
+	GaussianSystem(Device& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+	~GaussianSystem();
+
+	GaussianSystem(const GaussianSystem&) = delete;
+	GaussianSystem& operator=(const GaussianSystem&) = delete;
+
+	void render(FrameInfo& frameInfo, GSPointCloud& pointCloud);
+
+private:
+	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
+	void createPipeline(VkRenderPass renderPass);
+
+private:
+	Device& m_Device;
+
+	std::unique_ptr<Pipeline> m_Pipeline;
+	VkPipelineLayout m_PipelineLayout;
+};
+
+}
