@@ -32,9 +32,7 @@ struct RichPoint {
 	}
 
 	static std::vector<VkVertexInputAttributeDescription> getAttributeDescription() {
-		size_t shSize = 12;
-
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(5 + shSize);
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(6);
 		attributeDescriptions[0].location = 0;
 		attributeDescriptions[0].binding = 0;
 		attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
@@ -45,27 +43,25 @@ struct RichPoint {
 		attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
 		attributeDescriptions[1].offset = offsetof(RichPoint, normal);
 
-		for (uint32_t i = 0; i < shSize; i++) {
-			attributeDescriptions[2 + i].location = 2 + i;
-			attributeDescriptions[2 + i].binding = 0;
-			attributeDescriptions[2 + i].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-			attributeDescriptions[2 + i].offset = offsetof(RichPoint, shs) + 4 * i;
-		}
+		attributeDescriptions[2].location = 2;
+		attributeDescriptions[2].binding = 0;
+		attributeDescriptions[2].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[2].offset = offsetof(RichPoint, shs);
 
-		attributeDescriptions[shSize + 2].location = shSize + 2;
-		attributeDescriptions[shSize + 2].binding = 0;
-		attributeDescriptions[shSize + 2].format = VK_FORMAT_R32G32B32_SFLOAT;
-		attributeDescriptions[shSize + 2].offset = offsetof(RichPoint, scale);
+		attributeDescriptions[3].location = 3;
+		attributeDescriptions[3].binding = 0;
+		attributeDescriptions[3].format = VK_FORMAT_R32_SFLOAT;
+		attributeDescriptions[3].offset = offsetof(RichPoint, opacity);
 
-		attributeDescriptions[shSize + 3].location = shSize + 3;
-		attributeDescriptions[shSize + 3].binding = 0;
-		attributeDescriptions[shSize + 3].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		attributeDescriptions[shSize + 3].offset = offsetof(RichPoint, rotation);
+		attributeDescriptions[4].location = 4;
+		attributeDescriptions[4].binding = 0;
+		attributeDescriptions[4].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[4].offset = offsetof(RichPoint, scale);
 
-		attributeDescriptions[shSize + 4].location = shSize + 4;
-		attributeDescriptions[shSize + 4].binding = 0;
-		attributeDescriptions[shSize + 4].format = VK_FORMAT_R32_SFLOAT;
-		attributeDescriptions[shSize + 4].offset = offsetof(RichPoint, opacity);
+		attributeDescriptions[5].location = 5;
+		attributeDescriptions[5].binding = 0;
+		attributeDescriptions[5].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+		attributeDescriptions[5].offset = offsetof(RichPoint, rotation);
 
 		return attributeDescriptions;
 	}
