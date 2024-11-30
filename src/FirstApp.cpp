@@ -90,7 +90,7 @@ void FirstApp::run() {
 			// render
 			m_Renderer.beginSwapchainRenderPass(commandBuffer);
 
-			gaussianSystem.render(frameInfo, *m_PointCloud);
+			gaussianSystem.render(frameInfo, *m_Ellipsoids);
 
 			m_Renderer.endSwapchainRenderPass(commandBuffer);
 			m_Renderer.endFrame();
@@ -101,9 +101,9 @@ void FirstApp::run() {
 }
 
 void FirstApp::loadGameObjects() {
-	std::shared_ptr<GSSplats> splats = GSPointCloud::loadFromSplatsPly("assets/point_clouds/rotation_test.ply");
+	std::shared_ptr<Splats> splats = PointCloud::loadFromSplatsPly("assets/point_clouds/rotation_test.ply");
 	SASSERT_MSG(splats->valid, "Point cloud has to be valid!");
-	m_PointCloud = std::make_shared<GSPointCloud>(m_Device, splats);
+	m_Ellipsoids = std::make_shared<Ellipsoids>(m_Device, splats);
 }
 
 }

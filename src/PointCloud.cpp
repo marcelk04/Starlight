@@ -1,4 +1,4 @@
-#include "GaussianSplatting/GSPointCloud.hpp"
+#include "GaussianSplatting/PointCloud.hpp"
 
 #include "Core/Logger.hpp"
 #include "Core/Asserts.hpp"
@@ -9,26 +9,26 @@
 
 namespace stl {
 
-GSPointCloud::GSPointCloud(Device& device, std::shared_ptr<GSSplats> splats)
+PointCloud::PointCloud(Device& device, std::shared_ptr<Splats> splats)
 	: m_Device{ device } {
 	createVertexBuffers(splats->splats);
 }
 
-GSPointCloud::~GSPointCloud() {
+PointCloud::~PointCloud() {
 }
 
-void GSPointCloud::bind(VkCommandBuffer commandBuffer, uint32_t binding) {
+void PointCloud::bind(VkCommandBuffer commandBuffer, uint32_t binding) {
 	VkBuffer buffers[] = { m_VertexBuffer->getBuffer() };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, binding, 1, buffers, offsets);
 }
 
-void GSPointCloud::draw(VkCommandBuffer commandBuffer) const {
+void PointCloud::draw(VkCommandBuffer commandBuffer) const {
 	vkCmdDraw(commandBuffer, m_VertexCount, 1, 0, 0);
 }
 
-std::shared_ptr<GSSplats> GSPointCloud::loadFromSplatsPly(const std::string& path) {
-	std::shared_ptr<GSSplats> splats = std::make_unique<GSSplats>();
+std::shared_ptr<Splats> PointCloud::loadFromSplatsPly(const std::string& path) {
+	std::shared_ptr<Splats> splats = std::make_unique<Splats>();
 
 	splats->numSplats = 0;
 	splats->valid = false;
@@ -68,7 +68,7 @@ std::shared_ptr<GSSplats> GSPointCloud::loadFromSplatsPly(const std::string& pat
 	return std::move(splats);
 }
 
-void GSPointCloud::createVertexBuffers(const std::vector<RichPoint>& vertices) {
+void PointCloud::createVertexBuffers(const std::vector<RichPoint>& vertices) {
 	m_VertexCount = static_cast<uint32_t>(vertices.size());
 
 	SASSERT_MSG(m_VertexCount > 0, "Point cloud has to contain at least one point!");

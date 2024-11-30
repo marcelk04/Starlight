@@ -16,6 +16,7 @@ namespace Common {
 		(hashCombine(seed, rest), ...);
 	}
 
+	float sigmoid(float x);
 }
 
 }

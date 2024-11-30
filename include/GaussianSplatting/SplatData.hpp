@@ -75,7 +75,7 @@ struct RichPoint {
 	}
 };
 
-struct GSSplats {
+struct Splats {
 	bool valid;
 	int numSplats;
 	std::vector<RichPoint> splats;

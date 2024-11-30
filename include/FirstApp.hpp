@@ -1,6 +1,7 @@
 #pragma once
 
-#include "GaussianSplatting/GSPointCloud.hpp"
+#include "GaussianSplatting/PointCloud.hpp"
+#include "GaussianSplatting/Ellipsoids.hpp"
 #include "renderer/rendersystems/SimpleRenderSystem.hpp"
 #include "renderer/rendersystems/PointLightSystem.hpp"
 #include "renderer/rendersystems/GaussianSystem.hpp"
@@ -47,7 +48,7 @@ private:
 	std::unique_ptr<DescriptorPool> m_GlobalPool{};
 
 	GameObject::Map m_GameObjects;
-	std::shared_ptr<GSPointCloud> m_PointCloud;
+	std::shared_ptr<Ellipsoids> m_Ellipsoids;
 };
 
 }

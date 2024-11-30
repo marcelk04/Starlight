@@ -19,14 +19,14 @@ GaussianSystem::~GaussianSystem() {
 	vkDestroyPipelineLayout(m_Device.getDevice(), m_PipelineLayout, nullptr);
 }
 
-void GaussianSystem::render(FrameInfo& frameInfo, GSPointCloud& pointCloud) {
+void GaussianSystem::render(FrameInfo& frameInfo, Ellipsoids& ellipsoids) {
 	m_Pipeline->bind(frameInfo.commandBuffer);
 
 	vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &frameInfo.globalDescriptorSet, 0, nullptr);
 
 	m_CubeModel->bind(frameInfo.commandBuffer, 0);
-	pointCloud.bind(frameInfo.commandBuffer, 1);
-	m_CubeModel->draw(frameInfo.commandBuffer, pointCloud.getCount());
+	ellipsoids.bind(frameInfo.commandBuffer, 1);
+	m_CubeModel->draw(frameInfo.commandBuffer, ellipsoids.getCount());
 }
 
 void GaussianSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
@@ -61,21 +61,37 @@ void GaussianSystem::createPipeline(VkRenderPass renderPass) {
 }
 
 std::vector<VkVertexInputBindingDescription> GaussianSystem::getBindingDescription() const {
-	std::vector<VkVertexInputBindingDescription> bindingDescriptions(2);
+	std::vector<VkVertexInputBindingDescription> bindingDescriptions(6);
 
 	bindingDescriptions[0].binding = 0;
 	bindingDescriptions[0].stride = sizeof(Model::Vertex);
 	bindingDescriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
 	bindingDescriptions[1].binding = 1;
-	bindingDescriptions[1].stride = sizeof(RichPoint);
+	bindingDescriptions[1].stride = sizeof(glm::vec4);
 	bindingDescriptions[1].inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
+
+	bindingDescriptions[2].binding = 2;
+	bindingDescriptions[2].stride = sizeof(glm::vec4);
+	bindingDescriptions[2].inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
+
+	bindingDescriptions[3].binding = 3;
+	bindingDescriptions[3].stride = sizeof(glm::vec4);
+	bindingDescriptions[3].inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
+
+	bindingDescriptions[4].binding = 4;
+	bindingDescriptions[4].stride = sizeof(glm::vec4);
+	bindingDescriptions[4].inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
+
+	bindingDescriptions[5].binding = 5;
+	bindingDescriptions[5].stride = sizeof(float);
+	bindingDescriptions[5].inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
 
 	return bindingDescriptions;
 }
 
 std::vector<VkVertexInputAttributeDescription> GaussianSystem::getAttributeDescription() const {
-	std::vector<VkVertexInputAttributeDescription> attributeDescriptions(10);
+	std::vector<VkVertexInputAttributeDescription> attributeDescriptions(9);
 
 	// Per Vertex Data
 	attributeDescriptions[0].location = 0;
@@ -101,33 +117,28 @@ std::vector<VkVertexInputAttributeDescription> GaussianSystem::getAttributeDescr
 	// Per Instance Data
 	attributeDescriptions[4].location = 4;
 	attributeDescriptions[4].binding = 1;
-	attributeDescriptions[4].format = VK_FORMAT_R32G32B32_SFLOAT;
-	attributeDescriptions[4].offset = offsetof(RichPoint, position);
+	attributeDescriptions[4].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+	attributeDescriptions[4].offset = 0;
 
 	attributeDescriptions[5].location = 5;
-	attributeDescriptions[5].binding = 1;
-	attributeDescriptions[5].format = VK_FORMAT_R32G32B32_SFLOAT;
-	attributeDescriptions[5].offset = offsetof(RichPoint, normal);
+	attributeDescriptions[5].binding = 2;
+	attributeDescriptions[5].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+	attributeDescriptions[5].offset = 0;
 
 	attributeDescriptions[6].location = 6;
-	attributeDescriptions[6].binding = 1;
-	attributeDescriptions[6].format = VK_FORMAT_R32G32B32_SFLOAT;
-	attributeDescriptions[6].offset = offsetof(RichPoint, shs);
+	attributeDescriptions[6].binding = 3;
+	attributeDescriptions[6].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+	attributeDescriptions[6].offset = 0;
 
 	attributeDescriptions[7].location = 7;
-	attributeDescriptions[7].binding = 1;
-	attributeDescriptions[7].format = VK_FORMAT_R32_SFLOAT;
-	attributeDescriptions[7].offset = offsetof(RichPoint, opacity);
+	attributeDescriptions[7].binding = 4;
+	attributeDescriptions[7].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+	attributeDescriptions[7].offset = 0;
 
 	attributeDescriptions[8].location = 8;
-	attributeDescriptions[8].binding = 1;
-	attributeDescriptions[8].format = VK_FORMAT_R32G32B32_SFLOAT;
-	attributeDescriptions[8].offset = offsetof(RichPoint, scale);
-
-	attributeDescriptions[9].location = 9;
-	attributeDescriptions[9].binding = 1;
-	attributeDescriptions[9].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-	attributeDescriptions[9].offset = offsetof(RichPoint, rotation);
+	attributeDescriptions[8].binding = 5;
+	attributeDescriptions[8].format = VK_FORMAT_R32_SFLOAT;
+	attributeDescriptions[8].offset = 0;
 
 	return attributeDescriptions;
 }

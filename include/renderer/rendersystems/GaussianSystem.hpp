@@ -1,7 +1,8 @@
 #pragma once
 
 #include "GaussianSplatting/SplatData.hpp"
-#include "GaussianSplatting/GSPointCloud.hpp"
+#include "GaussianSplatting/PointCloud.hpp"
+#include "GaussianSplatting/Ellipsoids.hpp"
 #include "renderer/wrapper/Pipeline.hpp"
 #include "renderer/wrapper/Device.hpp"
 #include "renderer/Model.hpp"
@@ -27,7 +28,7 @@ public:
 	GaussianSystem(const GaussianSystem&) = delete;
 	GaussianSystem& operator=(const GaussianSystem&) = delete;
 
-	void render(FrameInfo& frameInfo, GSPointCloud& pointCloud);
+	void render(FrameInfo& frameInfo, Ellipsoids& ellipsoids);
 
 private:
 	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);

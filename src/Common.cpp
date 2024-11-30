@@ -24,4 +24,8 @@ std::vector<char> Common::readFile(const std::string& filepath) {
 	return buffer;
 }
 
+float Common::sigmoid(float x) {
+	return 1.0f / (1.0f + exp(-x));
+}
+
 }
