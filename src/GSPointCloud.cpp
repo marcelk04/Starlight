@@ -17,10 +17,10 @@ GSPointCloud::GSPointCloud(Device& device, std::shared_ptr<GSSplats> splats)
 GSPointCloud::~GSPointCloud() {
 }
 
-void GSPointCloud::bind(VkCommandBuffer commandBuffer) {
+void GSPointCloud::bind(VkCommandBuffer commandBuffer, uint32_t binding) {
 	VkBuffer buffers[] = { m_VertexBuffer->getBuffer() };
 	VkDeviceSize offsets[] = { 0 };
-	vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
+	vkCmdBindVertexBuffers(commandBuffer, binding, 1, buffers, offsets);
 }
 
 void GSPointCloud::draw(VkCommandBuffer commandBuffer) const {

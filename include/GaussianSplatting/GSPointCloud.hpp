@@ -18,7 +18,9 @@ public:
 	GSPointCloud(const GSPointCloud&) = delete;
 	GSPointCloud& operator=(const GSPointCloud&) = delete;
 
-	void bind(VkCommandBuffer commandBuffer);
+	uint32_t getCount() const { return m_VertexCount; }
+
+	void bind(VkCommandBuffer commandBuffer, uint32_t binding = 0);
 	void draw(VkCommandBuffer commandBuffer) const;
 
 	static std::shared_ptr<GSSplats> loadFromSplatsPly(const std::string& path);

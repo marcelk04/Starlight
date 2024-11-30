@@ -33,11 +33,16 @@ private:
 	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 	void createPipeline(VkRenderPass renderPass);
 
+	std::vector<VkVertexInputBindingDescription> getBindingDescription() const;
+	std::vector<VkVertexInputAttributeDescription> getAttributeDescription() const;
+
 private:
 	Device& m_Device;
 
 	std::unique_ptr<Pipeline> m_Pipeline;
 	VkPipelineLayout m_PipelineLayout;
+
+	std::shared_ptr<Model> m_CubeModel;
 };
 
 }

@@ -44,8 +44,8 @@ public:
 
 	static std::unique_ptr<Model> createModelFromFile(Device& device, const std::string& filepath);
 
-	void bind(VkCommandBuffer commandBuffer);
-	void draw(VkCommandBuffer commandBuffer) const;
+	void bind(VkCommandBuffer commandBuffer, uint32_t binding = 0);
+	void draw(VkCommandBuffer commandBuffer, uint32_t instanceCount = 1) const;
 
 private:
 	void createVertexBuffers(const std::vector<Vertex>& vertices);

@@ -41,21 +41,21 @@ std::unique_ptr<Model> Model::createModelFromFile(Device& device, const std::str
 	return std::make_unique<Model>(device, data);
 }
 
-void Model::bind(VkCommandBuffer commandBuffer) {
+void Model::bind(VkCommandBuffer commandBuffer, uint32_t binding) {
 	VkBuffer buffers[] = { m_VertexBuffer->getBuffer()};
 	VkDeviceSize offsets[] = { 0 };
-	vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
+	vkCmdBindVertexBuffers(commandBuffer, binding, 1, buffers, offsets);
 
 	if (m_HasIndexBuffer) {
 		vkCmdBindIndexBuffer(commandBuffer, m_IndexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 	}
 }
 
-void Model::draw(VkCommandBuffer commandBuffer) const {
+void Model::draw(VkCommandBuffer commandBuffer, uint32_t instanceCount) const {
 	if (m_HasIndexBuffer) {
-		vkCmdDrawIndexed(commandBuffer, m_IndexCount, 1, 0, 0, 0);
+		vkCmdDrawIndexed(commandBuffer, m_IndexCount, instanceCount, 0, 0, 0);
 	} else {
-		vkCmdDraw(commandBuffer, m_VertexCount, 1, 0, 0);
+		vkCmdDraw(commandBuffer, m_VertexCount, instanceCount, 0, 0);
 	}
 }
 
