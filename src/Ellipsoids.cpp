@@ -4,6 +4,7 @@
 #include "Core/Common.hpp"
 
 #include <vector>
+#include <array>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -51,36 +52,57 @@ void Ellipsoids::createBuffer(uint32_t elementSize, uint32_t elementCount, void*
 }
 
 void Ellipsoids::createBuffers(const std::vector<RichPoint>& points) {
-	m_PointCount = static_cast<uint32_t>(points.size());
+	std::vector<glm::vec4> positions;
+	std::vector<glm::vec4> scales;
+	std::vector<glm::vec4> colors;
+	std::vector<glm::vec4> quaternions;
+	std::vector<float> alphas;
 
-	SASSERT_MSG(m_PointCount > 0, "Point cloud has to contain at least one point!");
+	positions.reserve(points.size());
+	scales.reserve(points.size());
+	colors.reserve(points.size());
+	quaternions.reserve(points.size());
+	alphas.reserve(points.size());
 
-	std::vector<glm::vec4> positions(points.size());
-	std::vector<glm::vec4> scales(points.size());
-	std::vector<glm::vec4> colors(points.size());
-	std::vector<glm::vec4> quaternions(points.size());
-	std::vector<float> alphas(points.size());
+	const float alphaCutoff = 0.3f;
+	const float eps = 1e-3;
 
-	for (int i = 0; i < points.size(); i++) {
-		const glm::vec3& pos = points[i].position;
-		positions[i] = glm::vec4(pos.x, pos.y, pos.z, 1.0f);
+	for (const RichPoint& point : points) {
+		float alpha = Common::sigmoid(point.opacity);
+		if (alpha < alphaCutoff) continue;
 
-		const glm::vec3& scale = points[i].scale;
-		scales[i] = glm::vec4(exp(scale.x), exp(scale.y), exp(scale.z), 1.0f);
+		glm::vec3 scale = glm::exp(point.scale);
+		if (scale.x < eps || scale.y < eps || scale.z < eps) continue;
 
-		const SHs<3>& shs = points[i].shs;
-		colors[i] = glm::vec4(shs.shs[0], shs.shs[1], shs.shs[2], 1.0f);
+		positions.emplace_back(point.position, 1.0f);
 
-		quaternions[i] = glm::normalize(points[i].rotation);
+		scales.emplace_back(scale.x, scale.y, scale.z, 1.0f);
 
-		alphas[i] = Common::sigmoid(points[i].opacity);
+		const SHs<3>& shs = point.shs;
+		colors.emplace_back(shs.shs[0], shs.shs[1], shs.shs[2], 1.0f);
+
+		quaternions.emplace_back(glm::normalize(point.rotation));
+
+		alphas.emplace_back(alpha);
 	}
+
+	positions.shrink_to_fit();
+	scales.shrink_to_fit();
+	colors.shrink_to_fit();
+	quaternions.shrink_to_fit();
+	alphas.shrink_to_fit();
+
+	m_PointCount = positions.size();
+
+	SASSERT_MSG(m_PointCount > 0, "Point cloud has to contain at least one gaussian!");
 
 	createBuffer(sizeof(positions[0]), positions.size(), (void*)positions.data(), m_PositionBuffer);
 	createBuffer(sizeof(scales[0]), scales.size(), (void*)scales.data(), m_ScaleBuffer);
 	createBuffer(sizeof(colors[0]), colors.size(), (void*)colors.data(), m_ColorBuffer);
 	createBuffer(sizeof(quaternions[0]), quaternions.size(), (void*)quaternions.data(), m_QuaternionBuffer);
 	createBuffer(sizeof(alphas[0]), alphas.size(), (void*)alphas.data(), m_AlphaBuffer);
+
+	SINFO("Loaded ", positions.size(), " gaussians into GPU memory");
 }
 
 }

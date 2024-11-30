@@ -55,11 +55,7 @@ vec3 sphereIntersect(vec3 c, vec3 ro, vec3 p, out vec3 normal) {
 }
 
 void main() {
-	if (sAlpha < 0.3) {
-		discard;
-	}
-
-    vec3 camPos = vec3(ubo.inverseView[3]);
+    vec3 camPos = ubo.inverseView[3].xyz;
     vec3 normal = vec3(0.0);
 
     vec3 intersection = sphereIntersect(sCenter, camPos, sPosition, normal);
