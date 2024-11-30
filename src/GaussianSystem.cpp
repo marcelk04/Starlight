@@ -49,7 +49,7 @@ void GaussianSystem::createPipeline(VkRenderPass renderPass) {
 
 	PipelineConfigInfo pipelineConfig{};
 	Pipeline::defaultPipelineConfigInfo(pipelineConfig);
-	Pipeline::enableAlphaBlend(pipelineConfig);
+	//Pipeline::enableAlphaBlend(pipelineConfig);
 
 	pipelineConfig.bindingDescriptions = getBindingDescription();
 	pipelineConfig.attributeDescriptions = getAttributeDescription();

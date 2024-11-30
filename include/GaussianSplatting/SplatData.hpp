@@ -18,9 +18,9 @@ struct RichPoint {
 	glm::vec3 position;
 	glm::vec3 normal;
 	SHs<3> shs;
+	float opacity;
 	glm::vec3 scale;
 	glm::vec4 rotation;
-	float opacity;
 
 	static std::vector<VkVertexInputBindingDescription> getBindingDescription() {
 		std::vector<VkVertexInputBindingDescription> bindingDescriptions(1);
