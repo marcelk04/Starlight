@@ -54,7 +54,7 @@ void Ellipsoids::createBuffer(uint32_t elementSize, uint32_t elementCount, void*
 void Ellipsoids::createBuffers(const std::vector<RichPoint>& points) {
 	std::vector<glm::vec4> positions;
 	std::vector<glm::vec4> scales;
-	std::vector<std::array<glm::vec4, 12>> shs;
+	std::vector<std::array<glm::vec3, 16>> shs;
 	std::vector<glm::vec4> quaternions;
 	std::vector<float> alphas;
 
@@ -78,7 +78,7 @@ void Ellipsoids::createBuffers(const std::vector<RichPoint>& points) {
 
 		scales.emplace_back(scale.x, scale.y, scale.z, 1.0f);
 
-		std::array<glm::vec4, 12> sh;
+		std::array<glm::vec3, 16> sh;
 		std::memcpy(sh.data(), point.shs.shs, 48);
 		shs.emplace_back(std::move(sh));
 

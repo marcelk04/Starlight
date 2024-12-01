@@ -9,9 +9,9 @@ layout(location = 3) in vec2 inUV;
 // Per-Instance Data
 layout(location = 4) in vec4 instancePos;
 layout(location = 5) in vec4 instanceScale;
-layout(location = 6) in vec4[12] sh;
-layout(location = 18) in vec4 instanceQuat;
-layout(location = 19) in float instanceAlpha;
+layout(location = 6) in vec3[16] sh;
+layout(location = 22) in vec4 instanceQuat;
+layout(location = 23) in float instanceAlpha;
 
 layout(location = 0) out vec3 sColor;
 layout(location = 1) out vec3 sPosition;
@@ -62,25 +62,25 @@ mat3 quatToMat(vec4 q) {
 
 vec3 computeSH(vec3 center, vec3 camPos) {
 	vec3 direction = normalize(center - camPos);
-	direction = direction.zxy;
+	//direction = direction.zxy;
 	float x = direction.x, y = direction.y, z = direction.z;
 
-	vec3 c = SH_C0 * vec3(sh[0].x, sh[0].y, sh[0].z)
-		- SH_C1 * vec3(sh[0].w, sh[1].x, sh[1].y) * y
-		+ SH_C1 * vec3(sh[1].z, sh[1].w, sh[2].x) * z
-		- SH_C1 * vec3(sh[2].y, sh[2].z, sh[2].w) * x;
-		/*+ SH_C2[0] * vec3(sh[3].x, sh[3].y, sh[3].z) * x * y
-		- SH_C2[1] * vec3(sh[3].w, sh[4].x, sh[4].y) * y * z
-		+ SH_C2[2] * vec3(sh[4].z, sh[4].w, sh[5].x) * (3.0 * z * z - 1.0)
-		- SH_C2[3] * vec3(sh[5].y, sh[5].z, sh[5].w) * x * z
-		+ SH_C2[4] * vec3(sh[6].x, sh[6].y, sh[6].z) * (x * x - y * y)
-		- SH_C3[0] * vec3(sh[6].w, sh[7].x, sh[7].y) * y * (3.0 * x * x - y * y)
-		+ SH_C3[1] * vec3(sh[7].z, sh[7].w, sh[7].x) * x * y * z
-		- SH_C3[2] * vec3(sh[8].y, sh[8].z, sh[8].w) * y * (5.0 * z * z - 1.0)
-		+ SH_C3[3] * vec3(sh[9].x, sh[9].y, sh[9].z) * z * (5.0 * z * z - 3.0)
-		- SH_C3[4] * vec3(sh[9].w, sh[10].x, sh[10].y) * x * (5.0 * z * z - 1.0)
-		+ SH_C3[5] * vec3(sh[10].z, sh[10].w, sh[11].x) * z * (x * x - y * y)
-		- SH_C3[6] * vec3(sh[11].y, sh[11].z, sh[11].w) * x * (x * x - 3.0 * y * y);
+	vec3 c = SH_C0 * sh[0]
+		- SH_C1 *    sh[1] * y
+		+ SH_C1 *    sh[2] * z
+		- SH_C1 *    sh[3] * x;
+		/*+ SH_C2[0] * sh[4] * x * y
+		- SH_C2[1] * sh[5] * y * z
+		+ SH_C2[2] * sh[6] * (3.0 * z * z - 1.0)
+		- SH_C2[3] * sh[7] * x * z
+		+ SH_C2[4] * sh[8] * (x * x - y * y)
+		- SH_C3[0] * sh[9] * y * (3.0 * x * x - y * y)
+		+ SH_C3[1] * sh[10] * x * y * z
+		- SH_C3[2] * sh[11] * y * (5.0 * z * z - 1.0)
+		+ SH_C3[3] * sh[12] * z * (5.0 * z * z - 3.0)
+		- SH_C3[4] * sh[13] * x * (5.0 * z * z - 1.0)
+		+ SH_C3[5] * sh[14] * z * (x * x - y * y)
+		- SH_C3[6] * sh[15] * x * (x * x - 3.0 * y * y);
 
 
 
@@ -105,13 +105,13 @@ vec3 computeSH(vec3 center, vec3 camPos) {
     c += SH_C3[5] * getSHVec3(14) * (x * x - y * y) * z;
     c += SH_C3[6] * getSHVec3(15) * x * (x * x - 3.0 * y * y);*/
 
-	//c += 0.5;
+	c += vec3(0.5, 0.5, 0.5);
 
 	if (c.x < 0.0) {
 		c.x = 0.0;
 	}
 
-	return c + vec3(0.5, 0.5, 0.5);
+	return c;
 }
 
 void main() {
