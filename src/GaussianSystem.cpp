@@ -76,7 +76,7 @@ std::vector<VkVertexInputBindingDescription> GaussianSystem::getBindingDescripti
 	bindingDescriptions[2].inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
 
 	bindingDescriptions[3].binding = 3;
-	bindingDescriptions[3].stride = sizeof(glm::vec4);
+	bindingDescriptions[3].stride = sizeof(std::array<glm::vec4, 12>);
 	bindingDescriptions[3].inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
 
 	bindingDescriptions[4].binding = 4;
@@ -91,7 +91,7 @@ std::vector<VkVertexInputBindingDescription> GaussianSystem::getBindingDescripti
 }
 
 std::vector<VkVertexInputAttributeDescription> GaussianSystem::getAttributeDescription() const {
-	std::vector<VkVertexInputAttributeDescription> attributeDescriptions(9);
+	std::vector<VkVertexInputAttributeDescription> attributeDescriptions(20);
 
 	// Per Vertex Data
 	attributeDescriptions[0].location = 0;
@@ -125,20 +125,22 @@ std::vector<VkVertexInputAttributeDescription> GaussianSystem::getAttributeDescr
 	attributeDescriptions[5].format = VK_FORMAT_R32G32B32A32_SFLOAT;
 	attributeDescriptions[5].offset = 0;
 
-	attributeDescriptions[6].location = 6;
-	attributeDescriptions[6].binding = 3;
-	attributeDescriptions[6].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-	attributeDescriptions[6].offset = 0;
+	for (int i = 0; i < 12; i++) {
+		attributeDescriptions[6 + i].location = 6 + i;
+		attributeDescriptions[6 + i].binding = 3;
+		attributeDescriptions[6 + i].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+		attributeDescriptions[6 + i].offset = i * 4 * 4;
+	}
 
-	attributeDescriptions[7].location = 7;
-	attributeDescriptions[7].binding = 4;
-	attributeDescriptions[7].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-	attributeDescriptions[7].offset = 0;
+	attributeDescriptions[18].location = 18;
+	attributeDescriptions[18].binding = 4;
+	attributeDescriptions[18].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+	attributeDescriptions[18].offset = 0;
 
-	attributeDescriptions[8].location = 8;
-	attributeDescriptions[8].binding = 5;
-	attributeDescriptions[8].format = VK_FORMAT_R32_SFLOAT;
-	attributeDescriptions[8].offset = 0;
+	attributeDescriptions[19].location = 19;
+	attributeDescriptions[19].binding = 5;
+	attributeDescriptions[19].format = VK_FORMAT_R32_SFLOAT;
+	attributeDescriptions[19].offset = 0;
 
 	return attributeDescriptions;
 }

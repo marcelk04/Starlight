@@ -34,7 +34,7 @@ private:
 
 	std::unique_ptr<Buffer> m_PositionBuffer;
 	std::unique_ptr<Buffer> m_ScaleBuffer;
-	std::unique_ptr<Buffer> m_ColorBuffer;
+	std::unique_ptr<Buffer> m_SHBuffer;
 	std::unique_ptr<Buffer> m_QuaternionBuffer;
 	std::unique_ptr<Buffer> m_AlphaBuffer;
 };

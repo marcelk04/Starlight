@@ -21,7 +21,7 @@ Ellipsoids::~Ellipsoids() {
 }
 
 void Ellipsoids::bind(VkCommandBuffer commandBuffer, uint32_t binding) {
-	VkBuffer buffers[] = { m_PositionBuffer->getBuffer(), m_ScaleBuffer->getBuffer(), m_ColorBuffer->getBuffer(), m_QuaternionBuffer->getBuffer(), m_AlphaBuffer->getBuffer() };
+	VkBuffer buffers[] = { m_PositionBuffer->getBuffer(), m_ScaleBuffer->getBuffer(), m_SHBuffer->getBuffer(), m_QuaternionBuffer->getBuffer(), m_AlphaBuffer->getBuffer() };
 	VkDeviceSize offsets[] = { 0, 0, 0, 0, 0 };
 	vkCmdBindVertexBuffers(commandBuffer, binding, 5, buffers, offsets);
 }
@@ -54,13 +54,13 @@ void Ellipsoids::createBuffer(uint32_t elementSize, uint32_t elementCount, void*
 void Ellipsoids::createBuffers(const std::vector<RichPoint>& points) {
 	std::vector<glm::vec4> positions;
 	std::vector<glm::vec4> scales;
-	std::vector<glm::vec4> colors;
+	std::vector<std::array<glm::vec4, 12>> shs;
 	std::vector<glm::vec4> quaternions;
 	std::vector<float> alphas;
 
 	positions.reserve(points.size());
 	scales.reserve(points.size());
-	colors.reserve(points.size());
+	shs.reserve(points.size());
 	quaternions.reserve(points.size());
 	alphas.reserve(points.size());
 
@@ -78,8 +78,9 @@ void Ellipsoids::createBuffers(const std::vector<RichPoint>& points) {
 
 		scales.emplace_back(scale.x, scale.y, scale.z, 1.0f);
 
-		const SHs<3>& shs = point.shs;
-		colors.emplace_back(shs.shs[0], shs.shs[1], shs.shs[2], 1.0f);
+		std::array<glm::vec4, 12> sh;
+		std::memcpy(sh.data(), point.shs.shs, 48);
+		shs.emplace_back(std::move(sh));
 
 		quaternions.emplace_back(glm::normalize(point.rotation));
 
@@ -88,7 +89,7 @@ void Ellipsoids::createBuffers(const std::vector<RichPoint>& points) {
 
 	positions.shrink_to_fit();
 	scales.shrink_to_fit();
-	colors.shrink_to_fit();
+	shs.shrink_to_fit();
 	quaternions.shrink_to_fit();
 	alphas.shrink_to_fit();
 
@@ -98,7 +99,7 @@ void Ellipsoids::createBuffers(const std::vector<RichPoint>& points) {
 
 	createBuffer(sizeof(positions[0]), positions.size(), (void*)positions.data(), m_PositionBuffer);
 	createBuffer(sizeof(scales[0]), scales.size(), (void*)scales.data(), m_ScaleBuffer);
-	createBuffer(sizeof(colors[0]), colors.size(), (void*)colors.data(), m_ColorBuffer);
+	createBuffer(sizeof(shs[0]), shs.size(), (void*)shs.data(), m_SHBuffer);
 	createBuffer(sizeof(quaternions[0]), quaternions.size(), (void*)quaternions.data(), m_QuaternionBuffer);
 	createBuffer(sizeof(alphas[0]), alphas.size(), (void*)alphas.data(), m_AlphaBuffer);
 
