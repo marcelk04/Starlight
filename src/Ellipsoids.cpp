@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <array>
+#include <cstring>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

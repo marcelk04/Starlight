@@ -103,7 +103,7 @@ void FirstApp::run() {
 }
 
 void FirstApp::loadGameObjects() {
-	std::shared_ptr<Splats> splats = PointCloud::loadFromSplatsPly("assets/point_clouds/09_12_distortion.ply");
+	std::shared_ptr<Splats> splats = PointCloud::loadFromSplatsPly("assets/point_clouds/05_12_masks.ply");
 	SASSERT_MSG(splats->valid, "Point cloud has to be valid!");
 	m_Ellipsoids = std::make_shared<Ellipsoids>(m_Device, splats);
 }
