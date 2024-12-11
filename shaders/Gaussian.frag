@@ -23,53 +23,71 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
 	int numLights;
 } ubo;
 
-/**
- * This function checks for whether (p - ro) intersects a sphere
- * located at c, with radius r = 1.0.
- */
-vec3 sphereIntersect(vec3 c, vec3 ro, vec3 p, out vec3 normal) {
-    mat3 sphereRotationT = transpose(sRot);
+bool ellipsoidIntersectWithOutput(vec3 rayOrigin, vec3 rayDir, out vec3 intersection, out vec3 normal) {
+	dvec3 localRayOrigin = (rayOrigin - sCenter) * sRot;
+	dvec3 localRayDir = normalize(rayDir * sRot);
 
-    vec3 rd = vec3(sphereRotationT * normalize(p - ro)) / vec3(sScale);
-    vec3 u = (sphereRotationT * vec3(ro - c)) / vec3(sScale); // ro relative to c
+	dvec3 invScale = 1.0 / dvec3(sScale);
 
-    float a = dot(rd, rd);
-    float b = 2.0 * dot(u, rd);
-    float cc = dot(u, u) - 1.0;
+	double a = dot(localRayDir * invScale, localRayDir * invScale);
+	double b = 2.0 * dot(localRayDir * invScale, localRayOrigin * invScale);
+	double c = dot(localRayOrigin * invScale, localRayOrigin * invScale) - 1.0;
 
-    float discriminant = b * b - 4 * a * cc;
+	double discriminant = b * b - 4.0 * a * c;
 
-    // no intersection
-    if (discriminant < 0.0) {
-        return vec3(0.0);
-    }
+	if (discriminant < 0.0) {
+		return false;
+	}
 
-    float t1 = (-b + sqrt(discriminant)) / (2.0 * a);
-    float t2 = (-b - sqrt(discriminant)) / (2.0 * a);
-    float t = min(t1, t2);
-    vec3 intersection = ro + sRot * (vec3(t * rd) * sScale);
-    vec3 localIntersection = ((mat3(sphereRotationT) * (intersection - c)) / sScale);
+	float t1 = float((-b - sqrt(discriminant)) / (2.0 * a));
+	float t2 = float((-b + sqrt(discriminant)) / (2.0 * a));
 
-    normal = sRot * localIntersection;
-    return intersection;
+	float t = min(t1, t2);
+
+	vec3 localIntersection = vec3(localRayOrigin + t * localRayDir);
+	vec3 localNormal = normalize(localIntersection * vec3(invScale));
+
+	intersection = sRot * localIntersection + sCenter;
+	normal = normalize(sRot * localNormal);
+
+	return true;
+}
+
+bool ellipsoidIntersect(vec3 rayOrigin, vec3 rayDir) {
+	dvec3 invScale = 1.0 / dvec3(sScale);
+
+	dvec3 localRayOrigin = ((rayOrigin - sCenter) * sRot) * invScale;
+	dvec3 localRayDir = normalize(rayDir * sRot) * invScale;
+
+	double a = dot(localRayDir, localRayDir);
+	double b = 2.0 * dot(localRayDir, localRayOrigin);
+	double c = dot(localRayOrigin, localRayOrigin) - 1.0;
+
+	double discriminant = b * b - 4.0 * a * c;
+
+	return discriminant >= 0.0;
 }
 
 void main() {
     vec3 camPos = ubo.inverseView[3].xyz;
-    vec3 normal = vec3(0.0);
+	//vec3 dir = normalize(sPosition - camPos);
+	vec3 dir = sPosition - camPos;
 
-    vec3 intersection = sphereIntersect(sCenter, camPos, sPosition, normal);
+	vec3 intersection = vec3(0.0);
+	vec3 normal = vec3(0.0);
 
-    if (intersection == vec3(0.0)) {
-        discard;
-    }
+	if (!ellipsoidIntersect(camPos, dir)) {
+		discard;
+	}
 
-    vec3 rd = normalize(camPos - intersection);
-    float align = max(dot(rd, normal), 0.1);
+	/*
+	float align = max(0.1, dot(-dir, normal));
 
-    vec4 newPos = ubo.projection * ubo.view * vec4(intersection, 1.0);
-    newPos /= newPos.w;
-    gl_FragDepth = newPos.z;
+	vec4 newPos = ubo.projection * ubo.view * vec4(intersection, 1.0);
+	newPos /= newPos.w;
 
-	outColor = vec4(align * sColor, 1.0);
+	gl_FragDepth = newPos.z;
+	*/
+
+	outColor = vec4(sColor, sAlpha);
 }

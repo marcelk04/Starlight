@@ -69,6 +69,8 @@ void FirstApp::run() {
 		float dt = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 		currentTime = newTime;
 
+		//SDEBUG("FPS: ", 1.0 / dt);
+
 		cameraController.moveInPlaneXZ(dt, viewerObject);
 		camera.setViewYXZ(viewerObject.p_Transform.translation, viewerObject.p_Transform.rotation);
 
@@ -101,7 +103,7 @@ void FirstApp::run() {
 }
 
 void FirstApp::loadGameObjects() {
-	std::shared_ptr<Splats> splats = PointCloud::loadFromSplatsPly("assets/point_clouds/Mars.ply");
+	std::shared_ptr<Splats> splats = PointCloud::loadFromSplatsPly("assets/point_clouds/09_12_distortion.ply");
 	SASSERT_MSG(splats->valid, "Point cloud has to be valid!");
 	m_Ellipsoids = std::make_shared<Ellipsoids>(m_Device, splats);
 }

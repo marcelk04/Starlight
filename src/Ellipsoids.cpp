@@ -64,7 +64,7 @@ void Ellipsoids::createBuffers(const std::vector<RichPoint>& points) {
 	quaternions.reserve(points.size());
 	alphas.reserve(points.size());
 
-	const float alphaCutoff = 0.3f;
+	const float alphaCutoff = 0.2f;
 	const float eps = 1e-3;
 
 	for (const RichPoint& point : points) {
@@ -72,7 +72,7 @@ void Ellipsoids::createBuffers(const std::vector<RichPoint>& points) {
 		if (alpha < alphaCutoff) continue;
 
 		glm::vec3 scale = glm::exp(point.scale);
-		if (scale.x < eps || scale.y < eps || scale.z < eps) continue;
+		//if (scale.x < eps || scale.y < eps || scale.z < eps) continue;
 
 		positions.emplace_back(point.position, 1.0f);
 
