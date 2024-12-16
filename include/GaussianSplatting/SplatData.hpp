@@ -11,9 +11,7 @@
 namespace stl {
 
 template<int D>
-struct SHs {
-	float shs[(D + 1) * (D + 1) * 3];
-};
+using SHs = float[(D + 1) * (D + 1) * 3];
 
 struct RichPoint {
 	glm::vec3 position;

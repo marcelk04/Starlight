@@ -44,7 +44,7 @@ std::shared_ptr<Gaussians> PlyLoader::loadPlyFile(const std::string& path) {
 
 	// End of file is triggered when file.read() reached the end of the file before reading the specified number of characters.
 	if (file.eof()) {
-		SWARN("Could only read ", file.gcount(), " of ", numSplats, " gaussians. The read data should still be valid.");
+		SWARN("Could only read ", (file.gcount() / sizeof(RichPoint)), " of ", numSplats, " gaussians. The read data could still be valid.");
 		gaussians->shrink_to_fit();
 	}
 	

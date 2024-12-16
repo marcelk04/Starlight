@@ -80,7 +80,12 @@ void Ellipsoids::createBuffers(const std::vector<RichPoint>& points) {
 		scales.emplace_back(scale, 1.0f);
 
 		std::array<glm::vec3, 16> sh;
-		std::memcpy(sh.data(), point.shs.shs, 48);
+		//std::memcpy(sh.data(), point.shs, 48 * sizeof(float));
+		sh[0] = glm::vec3(point.shs[0], point.shs[1], point.shs[2]);
+		int shNum = 16;
+		for (int i = 1; i < shNum; i++) {
+			sh[i] = glm::vec3(point.shs[(i - 1) + 3], point.shs[(i - 1) + shNum + 2], point.shs[(i - 1) + shNum * 2 + 1]);
+		}
 		shs.emplace_back(std::move(sh));
 
 		glm::vec4 rotation = glm::normalize(point.rotation);

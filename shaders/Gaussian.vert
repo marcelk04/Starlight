@@ -58,8 +58,8 @@ vec3 computeSH(vec3 center, vec3 camPos) {
 	//direction = direction.zxy;
 	float x = direction.x, y = direction.y, z = direction.z;
 	
-	vec3 c = SH_C0 * sh[0];
-		/*- SH_C1 *    sh[1] *  y
+	vec3 c = SH_C0 * sh[0]
+		- SH_C1 *    sh[1] *  y
 		+ SH_C1 *    sh[2] *  z
 		- SH_C1 *    sh[3] *  x
 		+ SH_C2[0] * sh[4] *  x * y
@@ -74,7 +74,6 @@ vec3 computeSH(vec3 center, vec3 camPos) {
 		- SH_C3[4] * sh[13] * x * (5.0 * z * z - 1.0)
 		+ SH_C3[5] * sh[14] * z * (x * x - y * y)
 		- SH_C3[6] * sh[15] * x * (x * x - 3.0 * y * y);
-		*/
 
 	c += vec3(0.5, 0.5, 0.5);
 
