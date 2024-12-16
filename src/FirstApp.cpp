@@ -2,6 +2,7 @@
 
 #include "Core/Logger.hpp"
 #include "Core/Asserts.hpp"
+#include "GaussianSplatting/PlyLoader.hpp"
 #include "input/Input.hpp"
 #include "renderer/wrapper/Buffer.hpp"
 #include "Camera.hpp"
@@ -61,6 +62,7 @@ void FirstApp::run() {
 	KeyboardMovementController cameraController{};
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
+	float time = 0.0f;
 
 	while (!m_Window.shouldClose()) {
 		glfwPollEvents();
@@ -68,6 +70,7 @@ void FirstApp::run() {
 		auto newTime = std::chrono::high_resolution_clock::now();
 		float dt = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 		currentTime = newTime;
+		time += dt;
 
 		//SDEBUG("FPS: ", 1.0 / dt);
 
@@ -86,6 +89,7 @@ void FirstApp::run() {
 			ubo.projection = camera.getProjection();
 			ubo.view = camera.getView();
 			ubo.inverseView = camera.getInverseView();
+			ubo.time = time;
 			uboBuffers[frameIndex]->writeToBuffer(&ubo);
 			uboBuffers[frameIndex]->flush();
 
@@ -103,9 +107,8 @@ void FirstApp::run() {
 }
 
 void FirstApp::loadGameObjects() {
-	std::shared_ptr<Splats> splats = PointCloud::loadFromSplatsPly("assets/point_clouds/05_12_masks.ply");
-	SASSERT_MSG(splats->valid, "Point cloud has to be valid!");
-	m_Ellipsoids = std::make_shared<Ellipsoids>(m_Device, splats);
+	std::shared_ptr<std::vector<RichPoint>> gaussians = PlyLoader::loadPlyFile("assets/point_clouds/09_12_distortion.ply");
+	m_Ellipsoids = std::make_shared<Ellipsoids>(m_Device, gaussians);
 }
 
 }

@@ -9,18 +9,11 @@ layout(location = 7) in float sAlpha;
 
 layout(location = 0) out vec4 outColor;
 
-struct PointLight {
-	vec4 position;
-	vec4 color;
-};
-
 layout(set = 0, binding = 0) uniform GlobalUbo {
 	mat4 projection;
 	mat4 view;
 	mat4 inverseView;
-	vec4 ambientLightColor;
-	PointLight pointLights[10];
-	int numLights;
+	float time;
 } ubo;
 
 bool ellipsoidIntersectWithOutput(vec3 rayOrigin, vec3 rayDir, out vec3 intersection, out vec3 normal) {
@@ -56,12 +49,15 @@ bool ellipsoidIntersectWithOutput(vec3 rayOrigin, vec3 rayDir, out vec3 intersec
 bool ellipsoidIntersect(vec3 rayOrigin, vec3 rayDir) {
 	dvec3 invScale = 1.0 / dvec3(sScale);
 
-	dvec3 localRayOrigin = ((rayOrigin - sCenter) * sRot) * invScale;
-	dvec3 localRayDir = normalize(rayDir * sRot) * invScale;
+	dvec3 localRayOrigin = ((rayOrigin - sCenter) * sRot);
+	dvec3 localRayDir = normalize(rayDir * sRot);
 
-	double a = dot(localRayDir, localRayDir);
-	double b = 2.0 * dot(localRayDir, localRayOrigin);
-	double c = dot(localRayOrigin, localRayOrigin) - 1.0;
+	dvec3 unitLocalRayOrigin = localRayOrigin * invScale;
+	dvec3 unitLocalRayDir = localRayDir * invScale;
+
+	double a = dot(unitLocalRayDir, unitLocalRayDir);
+	double b = 2.0 * dot(unitLocalRayDir, unitLocalRayOrigin);
+	double c = dot(unitLocalRayOrigin, unitLocalRayOrigin) - 1.0;
 
 	double discriminant = b * b - 4.0 * a * c;
 
@@ -69,12 +65,8 @@ bool ellipsoidIntersect(vec3 rayOrigin, vec3 rayDir) {
 }
 
 void main() {
-    vec3 camPos = ubo.inverseView[3].xyz;
-	//vec3 dir = normalize(sPosition - camPos);
-	vec3 dir = sPosition - camPos;
-
-	vec3 intersection = vec3(0.0);
-	vec3 normal = vec3(0.0);
+	vec3 camPos = ubo.inverseView[3].xyz;
+	vec3 dir = normalize(sPosition - camPos);
 
 	if (!ellipsoidIntersect(camPos, dir)) {
 		discard;

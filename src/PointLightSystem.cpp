@@ -24,13 +24,13 @@ void PointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo) {
 	for (auto& [id, obj] : frameInfo.gameObjects) {
 		if (!obj.p_PointLight.has_value()) continue;
 
-		ubo.pointLights[lightIndex].position = glm::vec4(obj.p_Transform.translation, 1.0f);
-		ubo.pointLights[lightIndex].color = glm::vec4(obj.p_Color, obj.p_PointLight->lightIntensity);
+		//ubo.pointLights[lightIndex].position = glm::vec4(obj.p_Transform.translation, 1.0f);
+		//ubo.pointLights[lightIndex].color = glm::vec4(obj.p_Color, obj.p_PointLight->lightIntensity);
 
 		lightIndex++;
 	}
 
-	ubo.numLights = lightIndex;
+	//ubo.numLights = lightIndex;
 }
 
 void PointLightSystem::render(FrameInfo& frameInfo) {

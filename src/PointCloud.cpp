@@ -9,9 +9,9 @@
 
 namespace stl {
 
-PointCloud::PointCloud(Device& device, std::shared_ptr<Splats> splats)
+PointCloud::PointCloud(Device& device, std::shared_ptr<Gaussians> gaussians)
 	: m_Device{ device } {
-	createVertexBuffers(splats->splats);
+	createVertexBuffers(*gaussians);
 }
 
 PointCloud::~PointCloud() {
@@ -25,47 +25,6 @@ void PointCloud::bind(VkCommandBuffer commandBuffer, uint32_t binding) {
 
 void PointCloud::draw(VkCommandBuffer commandBuffer) const {
 	vkCmdDraw(commandBuffer, m_VertexCount, 1, 0, 0);
-}
-
-std::shared_ptr<Splats> PointCloud::loadFromSplatsPly(const std::string& path) {
-	std::shared_ptr<Splats> splats = std::make_unique<Splats>();
-
-	splats->numSplats = 0;
-	splats->valid = false;
-
-	std::ifstream reader(std::filesystem::absolute(path), std::ios::binary);
-	if (!reader.good()) {
-		SERROR("Bad PLY reader: ", path);
-		return std::move(splats);
-	}
-
-	std::string buf;
-	std::getline(reader, buf);
-	std::getline(reader, buf);
-	std::getline(reader, buf);
-	std::stringstream ss(buf);
-	std::string dummy;
-
-	ss >> dummy >> dummy >> splats->numSplats;
-	splats->splats.resize(splats->numSplats);
-
-	SINFO("Loading ", splats->numSplats, " splats...");
-
-	while (std::getline(reader, dummy)) {
-		if (dummy.compare("end_header") == 0) {
-			break;
-		}
-	}
-
-	reader.read((char*)splats->splats.data(), splats->numSplats * sizeof(RichPoint));
-	if (reader.eof()) {
-		SERROR("Reader is EOF?");
-		return std::move(splats);
-	}
-
-	splats->valid = true;
-
-	return std::move(splats);
 }
 
 void PointCloud::createVertexBuffers(const std::vector<RichPoint>& vertices) {

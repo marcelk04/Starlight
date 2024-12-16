@@ -5,6 +5,7 @@
 #include "renderer/wrapper/Buffer.hpp"
 
 #include <memory>
+#include <vector>
 
 #include <vulkan/vulkan.h>
 
@@ -12,7 +13,7 @@ namespace stl {
 
 class Ellipsoids {
 public:
-	Ellipsoids(Device& device, std::shared_ptr<Splats> splats);
+	Ellipsoids(Device& device, std::shared_ptr<std::vector<RichPoint>> gaussians);
 	~Ellipsoids();
 
 	Ellipsoids(const Ellipsoids&) = delete;

@@ -21,19 +21,11 @@ layout(location = 3) out vec3 sScale;
 layout(location = 4) out mat3 sRot;
 layout(location = 7) out float sAlpha;
 
-struct PointLight {
-	vec4 position;
-	vec4 color;
-};
-
 layout(set = 0, binding = 0) uniform GlobalUbo {
 	mat4 projection;
 	mat4 view;
 	mat4 inverseView;
-	vec4 ambientLightColor;
-	PointLight pointLights[10];
-	int
-	numLights;
+	float time;
 } ubo;
 
 const float SH_C0 = 0.28209479177387814f;
@@ -56,9 +48,9 @@ const float SH_C3[] = {
 };
 
 mat3 quatToMat(vec4 q) {
-    return mat3(2.0 * (q.x * q.x + q.y * q.y) - 1.0, 2.0 * (q.y * q.z + q.x * q.w), 2.0 * (q.y * q.w - q.x * q.z), // 1st column
-                2.0 * (q.y * q.z - q.x * q.w), 2.0 * (q.x * q.x + q.z * q.z) - 1.0, 2.0 * (q.z * q.w + q.x * q.y), // 2nd column
-                2.0 * (q.y * q.w + q.x * q.z), 2.0 * (q.z * q.w - q.x * q.y), 2.0 * (q.x * q.x + q.w * q.w) - 1.0); // last column
+	return mat3(2.0 * (q.x * q.x + q.y * q.y) - 1.0, 2.0 * (q.y * q.z + q.x * q.w), 2.0 * (q.y * q.w - q.x * q.z), // 1st column
+				2.0 * (q.y * q.z - q.x * q.w), 2.0 * (q.x * q.x + q.z * q.z) - 1.0, 2.0 * (q.z * q.w + q.x * q.y), // 2nd column
+				2.0 * (q.y * q.w + q.x * q.z), 2.0 * (q.z * q.w - q.x * q.y), 2.0 * (q.x * q.x + q.w * q.w) - 1.0); // last column
 }
 
 vec3 computeSH(vec3 center, vec3 camPos) {
@@ -67,15 +59,15 @@ vec3 computeSH(vec3 center, vec3 camPos) {
 	float x = direction.x, y = direction.y, z = direction.z;
 	
 	vec3 c = SH_C0 * sh[0];
-		/*- SH_C1 *    sh[1] * y
-		+ SH_C1 *    sh[2] * z
-		- SH_C1 *    sh[3] * x
-		+ SH_C2[0] * sh[4] * x * y
-		- SH_C2[1] * sh[5] * y * z
-		+ SH_C2[2] * sh[6] * (3.0 * z * z - 1.0)
-		- SH_C2[3] * sh[7] * x * z
-		+ SH_C2[4] * sh[8] * (x * x - y * y)
-		- SH_C3[0] * sh[9] * y * (3.0 * x * x - y * y)
+		/*- SH_C1 *    sh[1] *  y
+		+ SH_C1 *    sh[2] *  z
+		- SH_C1 *    sh[3] *  x
+		+ SH_C2[0] * sh[4] *  x * y
+		- SH_C2[1] * sh[5] *  y * z
+		+ SH_C2[2] * sh[6] *  (3.0 * z * z - 1.0)
+		- SH_C2[3] * sh[7] *  x * z
+		+ SH_C2[4] * sh[8] *  (x * x - y * y)
+		- SH_C3[0] * sh[9] *  y * (3.0 * x * x - y * y)
 		+ SH_C3[1] * sh[10] * x * y * z
 		- SH_C3[2] * sh[11] * y * (5.0 * z * z - 1.0)
 		+ SH_C3[3] * sh[12] * z * (5.0 * z * z - 3.0)
@@ -84,28 +76,6 @@ vec3 computeSH(vec3 center, vec3 camPos) {
 		- SH_C3[6] * sh[15] * x * (x * x - 3.0 * y * y);
 		*/
 
-
-/*
-	vec3 c = SH_C0 * sh[0];
-
-    c -= SH_C1 * sh[1] * y;
-    c += SH_C1 * sh[2] * z;
-    c -= SH_C1 * sh[3] * x;
-
-    c += SH_C2[0] * sh[4] * x * y;
-    c += SH_C2[1] * sh[5] * y * z;
-    c += SH_C2[2] * sh[6] * (2.0 * z * z - x * x - y * y);
-    c += SH_C2[3] * sh[7] * z * x;
-    c += SH_C2[4] * sh[8] * (x * x - y * y);
-
-    c += SH_C3[0] * sh[9] * (3.0 * x * x - y * y) * y;
-    c += SH_C3[1] * sh[10] * x * y * z;
-    c += SH_C3[2] * sh[11] * (4.0 * z * z - x * x - y * y) * y;
-    c += SH_C3[3] * sh[12] * z * (2.0 * z * z - 3.0 * x * x - 3.0 * y * y);
-    c += SH_C3[4] * sh[13] * x * (4.0 * z * z - x * x - y * y);
-    c += SH_C3[5] * sh[14] * (x * x - y * y) * z;
-    c += SH_C3[6] * sh[15] * x * (x * x - 3.0 * y * y);
-	*/
 	c += vec3(0.5, 0.5, 0.5);
 
 	if (c.x < 0.0) {

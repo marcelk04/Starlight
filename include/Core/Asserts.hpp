@@ -10,7 +10,7 @@
 
 #if ASSERTIONS_ENABLED == 1
 
-#if _MSC_VER
+#ifdef _MSC_VER
 #include <intrin.h>
 #define debugBreak() __debugbreak()
 #else

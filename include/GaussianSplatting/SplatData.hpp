@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #define GLM_FORCE_RADIANS
@@ -75,10 +76,6 @@ struct RichPoint {
 	}
 };
 
-struct Splats {
-	bool valid;
-	int numSplats;
-	std::vector<RichPoint> splats;
-};
+using Gaussians = std::vector<RichPoint>;
 
 }

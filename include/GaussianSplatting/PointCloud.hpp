@@ -12,7 +12,7 @@ namespace stl {
 
 class PointCloud {
 public:
-	PointCloud(Device& device, std::shared_ptr<Splats> splats);
+	PointCloud(Device& device, std::shared_ptr<Gaussians> gaussians);
 	~PointCloud();
 
 	PointCloud(const PointCloud&) = delete;
@@ -22,8 +22,6 @@ public:
 
 	void bind(VkCommandBuffer commandBuffer, uint32_t binding = 0);
 	void draw(VkCommandBuffer commandBuffer) const;
-
-	static std::shared_ptr<Splats> loadFromSplatsPly(const std::string& path);
 
 private:
 	void createVertexBuffers(const std::vector<RichPoint>& vertices);

@@ -10,12 +10,14 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+
 
 namespace stl {
 
-Ellipsoids::Ellipsoids(Device& device, std::shared_ptr<Splats> splats)
+Ellipsoids::Ellipsoids(Device& device, std::shared_ptr<std::vector<RichPoint>> gaussians)
 	: m_Device{ device } {
-	createBuffers(splats->splats);
+	createBuffers(*gaussians);
 }
 
 Ellipsoids::~Ellipsoids() {
@@ -65,25 +67,24 @@ void Ellipsoids::createBuffers(const std::vector<RichPoint>& points) {
 	quaternions.reserve(points.size());
 	alphas.reserve(points.size());
 
-	const float alphaCutoff = 0.2f;
+	const float alphaCutoff = 0.3f;
 	const float eps = 1e-3;
 
 	for (const RichPoint& point : points) {
 		float alpha = Common::sigmoid(point.opacity);
 		if (alpha < alphaCutoff) continue;
 
-		glm::vec3 scale = glm::exp(point.scale);
-		//if (scale.x < eps || scale.y < eps || scale.z < eps) continue;
-
 		positions.emplace_back(point.position, 1.0f);
 
-		scales.emplace_back(scale.x, scale.y, scale.z, 1.0f);
+		glm::vec3 scale = glm::exp(point.scale);
+		scales.emplace_back(scale, 1.0f);
 
 		std::array<glm::vec3, 16> sh;
 		std::memcpy(sh.data(), point.shs.shs, 48);
 		shs.emplace_back(std::move(sh));
 
-		quaternions.emplace_back(glm::normalize(point.rotation));
+		glm::vec4 rotation = glm::normalize(point.rotation);
+		quaternions.emplace_back(rotation);
 
 		alphas.emplace_back(alpha);
 	}
@@ -98,11 +99,11 @@ void Ellipsoids::createBuffers(const std::vector<RichPoint>& points) {
 
 	SASSERT_MSG(m_PointCount > 0, "Point cloud has to contain at least one gaussian!");
 
-	createBuffer(sizeof(positions[0]), positions.size(), (void*)positions.data(), m_PositionBuffer);
-	createBuffer(sizeof(scales[0]), scales.size(), (void*)scales.data(), m_ScaleBuffer);
-	createBuffer(sizeof(shs[0]), shs.size(), (void*)shs.data(), m_SHBuffer);
+	createBuffer(sizeof(positions[0]),   positions.size(),   (void*)positions.data(),   m_PositionBuffer);
+	createBuffer(sizeof(scales[0]),      scales.size(),      (void*)scales.data(),      m_ScaleBuffer);
+	createBuffer(sizeof(shs[0]),         shs.size(),         (void*)shs.data(),         m_SHBuffer);
 	createBuffer(sizeof(quaternions[0]), quaternions.size(), (void*)quaternions.data(), m_QuaternionBuffer);
-	createBuffer(sizeof(alphas[0]), alphas.size(), (void*)alphas.data(), m_AlphaBuffer);
+	createBuffer(sizeof(alphas[0]),      alphas.size(),      (void*)alphas.data(),      m_AlphaBuffer);
 
 	SINFO("Loaded ", positions.size(), " gaussians into GPU memory");
 }
