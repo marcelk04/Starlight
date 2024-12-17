@@ -31,6 +31,8 @@ std::shared_ptr<Gaussians> PlyLoader::loadPlyFile(const std::string& path) {
 	ss >> dummy >> dummy >> numSplats;
 	SASSERT_MSG(numSplats > 0, "Invalid .ply file or file does not contain any gaussians.");
 
+	SINFO("'", path, "' contains ", numSplats, " gaussians.");
+
 	// Skip to the end of the header.
 	while (std::getline(file, line)) {
 		if (line == "end_header") {

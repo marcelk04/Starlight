@@ -100,7 +100,7 @@ void main() {
 	sRot = rot;
 	sAlpha = instanceAlpha;
 
-	sColor = computeSH(sPosition, ubo.inverseView[3].xyz);
+	sColor = computeSH(sCenter, ubo.inverseView[3].xyz);
 
 	gl_Position = ubo.projection * ubo.view * mPos;
 }

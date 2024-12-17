@@ -58,7 +58,8 @@ void FirstApp::run() {
 	Camera camera{};
 
 	GameObject viewerObject = GameObject::createGameObject();
-	viewerObject.p_Transform.translation = { 0.0f, 0.0f, 2.5f };
+	viewerObject.p_Transform.translation = { 0.0f, 0.0f, 0.0f };
+	viewerObject.p_Transform.rotation = { 0.0f, -glm::pi<float>(), 0.0f };
 	KeyboardMovementController cameraController{};
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
@@ -107,7 +108,7 @@ void FirstApp::run() {
 }
 
 void FirstApp::loadGameObjects() {
-	std::shared_ptr<std::vector<RichPoint>> gaussians = PlyLoader::loadPlyFile("assets/point_clouds/09_12_distortion.ply");
+	std::shared_ptr<std::vector<RichPoint>> gaussians = PlyLoader::loadPlyFile("assets/point_clouds/17_12_resolution_8x.ply");
 	m_Ellipsoids = std::make_shared<Ellipsoids>(m_Device, gaussians);
 }
 
