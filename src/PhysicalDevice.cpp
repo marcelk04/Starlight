@@ -13,6 +13,7 @@ PhysicalDevice::PhysicalDevice(Instance& instance, VkSurfaceKHR surface, VkPhysi
 	: m_Instance{ instance }, m_Surface{ surface }, m_PhysicalDevice {
 	physicalDevice
 } {
+	queryQueueFamilies();
 	vkGetPhysicalDeviceProperties(m_PhysicalDevice, &p_Properties);
 }
 
@@ -96,8 +97,6 @@ VkFormat PhysicalDevice::findSupportedFormat(const std::vector<VkFormat>& candid
 }
 
 bool PhysicalDevice::isSuitable() const {
-	QueueFamilyIndices indices = findQueueFamilies();
-
 	bool extensionsSupported = supportsDeviceExtensions();
 
 	bool swapchainAdequate = false;
@@ -109,12 +108,10 @@ bool PhysicalDevice::isSuitable() const {
 	VkPhysicalDeviceFeatures supportedFeatures;
 	vkGetPhysicalDeviceFeatures(m_PhysicalDevice, &supportedFeatures);
 
-	return indices.isComplete() && extensionsSupported && swapchainAdequate && supportedFeatures.samplerAnisotropy;
+	return m_Indices.isComplete() && extensionsSupported && swapchainAdequate && supportedFeatures.samplerAnisotropy;
 }
 
-QueueFamilyIndices PhysicalDevice::findQueueFamilies() const {
-	QueueFamilyIndices indices;
-
+void PhysicalDevice::queryQueueFamilies() {
 	uint32_t queueFamilyCount = 0;
 	vkGetPhysicalDeviceQueueFamilyProperties(m_PhysicalDevice, &queueFamilyCount, nullptr);
 
@@ -123,25 +120,31 @@ QueueFamilyIndices PhysicalDevice::findQueueFamilies() const {
 
 	int i = 0;
 	for (const auto& queueFamily : queueFamilies) {
-		if (queueFamily.queueCount > 0 && (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)) {
-			indices.graphicsFamily = i;
+		if (queueFamily.queueCount == 0) {
+			continue;
+		}
+
+		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+			m_Indices.graphicsFamily = i;
+		}
+
+		if (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT) {
+			m_Indices.computeFamily = i;
 		}
 
 		VkBool32 presentSupport = false;
 		vkGetPhysicalDeviceSurfaceSupportKHR(m_PhysicalDevice, i, m_Surface, &presentSupport);
 
-		if (queueFamily.queueCount > 0 && presentSupport) {
-			indices.presentFamily = i;
+		if (presentSupport) {
+			m_Indices.presentFamily = i;
 		}
 
-		if (indices.isComplete()) {
+		if (m_Indices.isComplete()) {
 			break;
 		}
 
 		i++;
 	}
-
-	return indices;
 }
 
 bool PhysicalDevice::supportsDeviceExtensions() const {

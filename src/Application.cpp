@@ -1,4 +1,4 @@
-#include "FirstApp.hpp"
+#include "Application.hpp"
 
 #include "Core/Logger.hpp"
 #include "Core/Asserts.hpp"
@@ -14,7 +14,8 @@
 
 namespace stl {
 
-FirstApp::FirstApp() {
+Application::Application(const std::string& gaussiansPath) 
+	: m_GaussiansPath{ gaussiansPath } {
 	m_GlobalPool = DescriptorPool::Builder(m_Device)
 		.setMaxSets(Swapchain::MAX_FRAMES_IN_FLIGHT)
 		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, Swapchain::MAX_FRAMES_IN_FLIGHT)
@@ -23,10 +24,10 @@ FirstApp::FirstApp() {
 	loadGameObjects();
 }
 
-FirstApp::~FirstApp() {
+Application::~Application() {
 }
 
-void FirstApp::run() {
+void Application::run() {
 	std::vector<std::unique_ptr<Buffer>> uboBuffers(Swapchain::MAX_FRAMES_IN_FLIGHT);
 
 	for (int i = 0; i < uboBuffers.size(); i++) {
@@ -107,8 +108,8 @@ void FirstApp::run() {
 	vkDeviceWaitIdle(m_Device.getDevice());
 }
 
-void FirstApp::loadGameObjects() {
-	std::shared_ptr<std::vector<RichPoint>> gaussians = PlyLoader::loadPlyFile("assets/point_clouds/17_12_resolution_8x.ply");
+void Application::loadGameObjects() {
+	std::shared_ptr<std::vector<RichPoint>> gaussians = PlyLoader::loadPlyFile(m_GaussiansPath);
 	m_Ellipsoids = std::make_shared<Ellipsoids>(m_Device, gaussians);
 }
 

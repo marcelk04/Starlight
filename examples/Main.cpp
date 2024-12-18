@@ -1,4 +1,4 @@
-#include "FirstApp.hpp"
+#include "Application.hpp"
 
 #include "Core/Logger.hpp"
 
@@ -8,10 +8,19 @@
 
 #include <filesystem>
 
-int main() {
+int main(int argc, char** argv) {
     std::filesystem::current_path(PROJ_DIR);
 
-    stl::FirstApp app;
+    std::string modelPath = "";
+
+    if (argc < 2) {
+        SWARN("No path to gaussians passed. Loading default model.");
+        modelPath = "assets/point_clouds/17_12_resolution_4x.ply";
+    } else {
+        modelPath = argv[1];
+    }
+
+    stl::Application app(modelPath);
 
     try {
         app.run();

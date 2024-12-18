@@ -27,6 +27,7 @@ public:
 	VkSurfaceKHR getSurface() const { return m_Surface; }
 	VkQueue getGraphicsQueue() const { return m_GraphicsQueue; }
 	VkQueue getPresentQueue() const { return m_PresentQueue; }
+	VkQueue getComputeQueue() const { return m_ComputeQueue; }
 
 	SwapchainSupportDetails getSwapchainSupport();
 	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
@@ -61,6 +62,7 @@ private:
 	VkSurfaceKHR m_Surface;
 	VkQueue m_GraphicsQueue;
 	VkQueue m_PresentQueue;
+	VkQueue m_ComputeQueue;
 
 	const std::vector<const char*> m_DeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 };

@@ -14,7 +14,9 @@
 #include <intrin.h>
 #define debugBreak() __debugbreak()
 #else
-#define debugBreak() __builtin_trap()
+//#define debugBreak() __builtin_trap()
+#include <signal.h>
+#define debugBreak() raise(SIGTRAP)
 #endif
 
 #define SASSERT(expr) if (!(expr)) { SFATAL("Assertion failed: '", #expr, "' (file ", __FILE__, ", line ", __LINE__, ')'); debugBreak(); }

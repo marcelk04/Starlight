@@ -18,9 +18,10 @@ struct SwapchainSupportDetails {
 struct QueueFamilyIndices {
 	std::optional<uint32_t> graphicsFamily;
 	std::optional<uint32_t> presentFamily;
+	std::optional<uint32_t> computeFamily;
 
 	bool isComplete() const {
-		return graphicsFamily.has_value() && presentFamily.has_value();
+		return graphicsFamily.has_value() && presentFamily.has_value() && computeFamily.has_value();
 	}
 };
 
@@ -30,6 +31,7 @@ public:
 	~PhysicalDevice();
 
 	VkPhysicalDevice getPhysicalDevice() const { return m_PhysicalDevice; }
+	QueueFamilyIndices getQueueFamilies() const { return m_Indices; }
 
 	static std::vector<PhysicalDevice> suitableDevices(Instance& instance, VkSurfaceKHR surface);
 	static std::vector<PhysicalDevice> enumeratePhysicalDevices(Instance& instance, VkSurfaceKHR surface);
@@ -38,7 +40,7 @@ public:
 	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) const;
 
 	bool isSuitable() const;
-	QueueFamilyIndices findQueueFamilies() const;
+	void queryQueueFamilies();
 	bool supportsDeviceExtensions() const;
 	SwapchainSupportDetails querySwapchainSupport() const;
 
@@ -50,6 +52,7 @@ private:
 	VkSurfaceKHR m_Surface;
 
 	VkPhysicalDevice m_PhysicalDevice;
+	QueueFamilyIndices m_Indices;
 
 	const std::vector<const char*> m_DeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 };

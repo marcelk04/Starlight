@@ -20,16 +20,17 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
 namespace stl {
 
-class FirstApp {
+class Application {
 public:
-	FirstApp();
-	~FirstApp();
+	Application(const std::string& gaussiansPath);
+	~Application();
 
-	FirstApp(const FirstApp&) = delete;
-	FirstApp& operator=(const FirstApp&) = delete;
+	Application(const Application&) = delete;
+	Application& operator=(const Application&) = delete;
 
 	void run();
 
@@ -41,6 +42,8 @@ public:
 	static constexpr int HEIGHT = 600;
 
 private:
+	std::string m_GaussiansPath;
+
 	Window m_Window{ WIDTH, HEIGHT, "Starlight" };
 	Device m_Device{ m_Window };
 	Renderer m_Renderer{ m_Window, m_Device };

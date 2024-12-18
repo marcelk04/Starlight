@@ -32,7 +32,7 @@ uint32_t Device::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags prope
 }
 
 QueueFamilyIndices Device::findPhysicalQueueFamilies() const {
-	return m_PhysicalDevice->findQueueFamilies();
+	return m_PhysicalDevice->getQueueFamilies();
 }
 
 VkFormat Device::findSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features) const {
@@ -158,13 +158,18 @@ void Device::createSurface() {
 
 void Device::pickPhysicalDevice() {
 	m_PhysicalDevice = std::make_shared<PhysicalDevice>(PhysicalDevice::suitableDevices(m_Instance, m_Surface)[0]);
+
+	QueueFamilyIndices indices = m_PhysicalDevice->getQueueFamilies();
+	SDEBUG("Graphics queue index: ", indices.graphicsFamily.value());
+	SDEBUG("Present queue index: ", indices.presentFamily.value());
+	SDEBUG("Compute queue index: ", indices.computeFamily.value());
 }
 
 void Device::createLogicalDevice() {
-	QueueFamilyIndices indices = m_PhysicalDevice->findQueueFamilies();
+	QueueFamilyIndices indices = m_PhysicalDevice->getQueueFamilies();
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value(), indices.computeFamily.value() };
 
 	float queuePriority = 1.0f;
 
@@ -197,6 +202,7 @@ void Device::createLogicalDevice() {
 
 	vkGetDeviceQueue(m_Device, indices.graphicsFamily.value(), 0, &m_GraphicsQueue);
 	vkGetDeviceQueue(m_Device, indices.presentFamily.value(), 0, &m_PresentQueue);
+	vkGetDeviceQueue(m_Device, indices.computeFamily.value(), 0, &m_ComputeQueue);
 }
 
 void Device::createCommandPool() {
