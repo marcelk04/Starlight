@@ -21,7 +21,7 @@ ShaderModule::~ShaderModule() {
     vkDestroyShaderModule(m_Device.getDevice(), m_Module, nullptr);
 }
 
-VkPipelineShaderStageCreateInfo ShaderModule::getPipelineShaderInfo() const {
+VkPipelineShaderStageCreateInfo ShaderModule::getStageInfo() const {
     VkPipelineShaderStageCreateInfo info{};
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     info.stage = static_cast<VkShaderStageFlagBits>(m_Type);

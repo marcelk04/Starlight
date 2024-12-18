@@ -5,6 +5,7 @@
 
 #include <vulkan/vulkan.h>
 
+#include <vector>
 #include <string>
 
 namespace stl {
@@ -15,12 +16,17 @@ public:
     Shader(Device& device, const std::string& csFilepath);
     ~Shader();
 
-    std::vector<VkPipelineShaderStageCreateInfo> getPipelineShaderInfos() const;
+	const std::vector<ShaderModule>& getShaderModules() const { return m_ShaderModules; }
+	const std::vector<VkPipelineShaderStageCreateInfo>& getStageInfos() const { return m_StageInfos; }
+
+private:
+	void queryStageInfos();
 
 private:
     Device& m_Device;
 
     std::vector<ShaderModule> m_ShaderModules;
+	std::vector<VkPipelineShaderStageCreateInfo> m_StageInfos;
 };
 
 }

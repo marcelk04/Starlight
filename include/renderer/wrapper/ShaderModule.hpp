@@ -29,7 +29,7 @@ public:
     VkShaderModule getModule() const { return m_Module; }
     Type getType() const { return m_Type; }
 
-    VkPipelineShaderStageCreateInfo getPipelineShaderInfo() const;
+    VkPipelineShaderStageCreateInfo getStageInfo() const;
 
 private:
     void createModule();

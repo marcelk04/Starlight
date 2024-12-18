@@ -113,7 +113,7 @@ void Pipeline::createGraphicsPipeline(const std::string& vsFilepath, const std::
 	SASSERT_MSG(configInfo.renderPass != VK_NULL_HANDLE, "Cannot create graphics pipeline: no render pass provided in configInfo");
 
 	Shader shader(m_Device, vsFilepath, fsFilepath);
-	const auto& shaderStages = shader.getPipelineShaderInfos();
+	const auto& shaderStages = shader.getStageInfos();
 
 	auto& bindingDescriptions = configInfo.bindingDescriptions;
 	auto& attributeDescriptions = configInfo.attributeDescriptions;
