@@ -1,12 +1,20 @@
 #include "renderer/wrapper/ShaderModule.hpp"
 
 #include <stdexcept>
+#include <utility>
 
 namespace stl {
 
 ShaderModule::ShaderModule(Device& device, const std::string& path, Type type) 
     : m_Device{ device }, m_Path{ path }, m_Type{ type } {
     createModule();
+}
+
+ShaderModule::ShaderModule(ShaderModule&& other) noexcept 
+	: m_Device{ other.m_Device }, 
+	m_Path{ std::move(other.m_Path) }, 
+	m_Module{ std::exchange(other.m_Module, VK_NULL_HANDLE) }, 
+	m_Type{ std::move(other.m_Type) } {
 }
 
 ShaderModule::~ShaderModule() {

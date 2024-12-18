@@ -22,7 +22,6 @@ find_package(Vulkan REQUIRED OPTIONAL_COMPONENTS glslc)
 add_compile_definitions(PROJ_DIR="${PROJECT_SOURCE_DIR}")
 
 add_executable(Main "examples/Main.cpp" ${SRC_FILES})
-
 target_link_libraries(Main Vulkan::Vulkan glfw tinyobjloader)
 
 if (Vulkan_glslc_FOUND)
@@ -39,10 +38,10 @@ if (Vulkan_glslc_FOUND)
 		list(APPEND SHADER_COMMANDS Vulkan::glslc)
 		list(APPEND SHADER_COMMANDS "${SHADER_SOURCE}")
 		list(APPEND SHADER_COMMANDS "-o")
-		list(APPEND SHADER_COMMANDS "${PROJECT_SOURCE_DIR}/shaders/${SHADER_NAME}.spv")
+		list(APPEND SHADER_COMMANDS "${SHADER_SOURCE}.spv")
 
 		# Add product
-		list(APPEND SHADER_PRODUCTS "${PROJECT_SOURCE_DIR}/shaders/${SHADER_NAME}.spv")
+		list(APPEND SHADER_PRODUCTS "${SHADER_SOURCE}.spv")
 	endforeach()
 
 	add_custom_target(CompileShaders ALL

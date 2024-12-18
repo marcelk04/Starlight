@@ -67,7 +67,7 @@ void Application::run() {
 	float time = 0.0f;
 
 	while (!m_Window.shouldClose()) {
-		glfwPollEvents();
+		m_Window.pollEvents();
 
 		auto newTime = std::chrono::high_resolution_clock::now();
 		float dt = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();

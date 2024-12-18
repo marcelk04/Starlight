@@ -19,10 +19,9 @@ public:
 
 public:
     ShaderModule(Device& device, const std::string& path, Type type);
+	ShaderModule(const ShaderModule&) = delete;
+	ShaderModule(ShaderModule&& other) noexcept;
     ~ShaderModule();
-
-    ShaderModule(const ShaderModule&) = delete;
-    ShaderModule(ShaderModule&&) = default;
 
     ShaderModule& operator=(const ShaderModule&) = delete;
     ShaderModule& operator=(ShaderModule&&) = default;
@@ -38,7 +37,7 @@ private:
 private:
     Device& m_Device;
 
-    const std::string& m_Path;
+    std::string m_Path;
     VkShaderModule m_Module;
     Type m_Type;
 };

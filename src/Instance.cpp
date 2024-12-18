@@ -65,10 +65,10 @@ Instance::Instance() {
 	setupDebugMessenger();
 }
 
-Instance::Instance(Instance&& other) noexcept {
-	m_Instance = std::exchange(other.m_Instance, VK_NULL_HANDLE);
-	m_DebugMessenger = std::exchange(other.m_DebugMessenger, VK_NULL_HANDLE);
-	m_EnableValidationLayers = std::exchange(other.m_EnableValidationLayers, false);
+Instance::Instance(Instance&& other) noexcept
+	: m_Instance{ std::exchange(other.m_Instance, VK_NULL_HANDLE) },
+	m_DebugMessenger{ std::exchange(other.m_DebugMessenger, VK_NULL_HANDLE) },
+	m_EnableValidationLayers{ std::exchange(other.m_EnableValidationLayers, false) } {
 }
 
 Instance::~Instance() {

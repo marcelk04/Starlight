@@ -11,15 +11,17 @@ class Window {
 public:
 	Window(int width, int height, const std::string& name);
 	Window(const Window&) = delete;
-	Window(Window&&) = delete;
+	Window(Window&& other) noexcept;
 	~Window();
 
 	Window& operator=(const Window&) = delete;
-	Window& operator=(Window&&) = delete;
+	Window& operator=(Window&&) = default;
 
 	VkExtent2D getExtent() const { return { static_cast<uint32_t>(m_Width), static_cast<uint32_t>(m_Height) }; }
 	bool shouldClose() const;
 	bool wasWindowResized() const { return m_FramebufferResized; }
+
+	void pollEvents() const { glfwPollEvents(); }
 	void resetWindowResizedFlag() { m_FramebufferResized = false; }
 
 	void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);

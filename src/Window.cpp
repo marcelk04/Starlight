@@ -3,6 +3,7 @@
 #include "input/Input.hpp"
 
 #include <stdexcept>
+#include <utility>
 
 namespace stl {
 
@@ -11,6 +12,14 @@ Window::Window(int width, int height, const std::string& name)
 	initWindow();
 
 	Input::setWindowPtr(m_Window);
+}
+
+Window::Window(Window&& other) noexcept 
+	: m_Width{ std::exchange(other.m_Width, 0) },
+	m_Height{ std::exchange(other.m_Height, 0) },
+	m_FramebufferResized{ std::exchange(other.m_FramebufferResized, false) },
+	m_Name{ std::move(other.m_Name) },
+	m_Window{ std::exchange(other.m_Window, nullptr) } {
 }
 
 Window::~Window() {
