@@ -1,5 +1,7 @@
 #pragma once
 
+#include "renderer/Bindable.hpp"
+#include "renderer/Drawable.hpp"
 #include "renderer/Model.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -23,6 +25,11 @@ struct PointLightComponent {
 	float lightIntensity = 1.0f;
 };
 
+struct InstanceComponent {
+	std::shared_ptr<Bindable> instanceData{ nullptr };
+	uint32_t instanceCount{ 1 };
+};
+
 class GameObject {
 public:
 	using id_t = uint32_t;
@@ -44,11 +51,12 @@ private:
 	GameObject(id_t objectId);
 
 public:
-	std::shared_ptr<Model> p_Model{};
+	std::shared_ptr<Drawable> p_Model{};
 	glm::vec3 p_Color{};
 
 	TransformComponent p_Transform{};
 	std::optional<PointLightComponent> p_PointLight = std::nullopt;
+	std::optional<InstanceComponent> p_Instance = std::nullopt;
 
 private:
 	id_t m_Id;

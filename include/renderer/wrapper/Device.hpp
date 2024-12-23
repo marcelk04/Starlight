@@ -4,9 +4,7 @@
 #include "renderer/wrapper/Instance.hpp"
 #include "renderer/wrapper/PhysicalDevice.hpp"
 
-#include <string>
 #include <vector>
-#include <optional>
 #include <memory>
 
 namespace stl {
@@ -14,13 +12,12 @@ namespace stl {
 class Device {
 public:
 	Device(Window& window);
+	Device(const Device&) = delete;
+	Device(Device&& other) noexcept;
 	~Device();
 
-	Device(const Device&) = delete;
-	Device(Device&&) = delete;
-
 	Device& operator=(const Device&) = delete;
-	Device& operator=(Device&&) = delete;
+	Device& operator=(Device&& other) = default;
 
 	VkCommandPool getCommandPool() const { return m_CommandPool; }
 	VkDevice getDevice() const { return m_Device; }

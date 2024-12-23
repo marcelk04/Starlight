@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GaussianSplatting/SplatData.hpp"
+#include "renderer/Drawable.hpp"
 #include "renderer/wrapper/Device.hpp"
 #include "renderer/wrapper/Buffer.hpp"
 
@@ -11,18 +12,18 @@
 
 namespace stl {
 
-class Ellipsoids {
+class Ellipsoids : public Drawable {
 public:
 	Ellipsoids(Device& device, std::shared_ptr<std::vector<RichPoint>> gaussians);
-	~Ellipsoids();
+	virtual ~Ellipsoids();
 
 	Ellipsoids(const Ellipsoids&) = delete;
 	Ellipsoids& operator=(const Ellipsoids&) = delete;
 
 	uint32_t getCount() const { return m_PointCount; }
 
-	void bind(VkCommandBuffer commandBuffer, uint32_t binding = 0);
-	void draw(VkCommandBuffer commandBuffer) const;
+	virtual void bind(VkCommandBuffer commandBuffer, uint32_t firstBinding = 0) override;
+	virtual void draw(VkCommandBuffer commandBuffer, uint32_t instanceCount = 1) const override;
 
 private:
 	void createBuffer(uint32_t elementSize, uint32_t elementCount, void* data, std::unique_ptr<Buffer>& buffer);

@@ -10,11 +10,11 @@ class Instance {
 public:
 	Instance();
 	Instance(const Instance&) = delete;
-	Instance(Instance&&) noexcept;
+	Instance(Instance&& other) noexcept;
 	~Instance();
 
 	Instance& operator=(const Instance&) = delete;
-	Instance& operator=(Instance&&) = default;
+	Instance& operator=(Instance&& other) = default;
 
 	VkInstance getInstance() const { return m_Instance; }
 

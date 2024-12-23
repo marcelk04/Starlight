@@ -15,7 +15,7 @@ public:
 	~Window();
 
 	Window& operator=(const Window&) = delete;
-	Window& operator=(Window&&) = default;
+	Window& operator=(Window&& other) = default;
 
 	VkExtent2D getExtent() const { return { static_cast<uint32_t>(m_Width), static_cast<uint32_t>(m_Height) }; }
 	bool shouldClose() const;

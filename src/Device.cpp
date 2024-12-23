@@ -16,6 +16,19 @@ Device::Device(Window& window)
 	createCommandPool();
 }
 
+Device::Device(Device&& other) noexcept
+	: m_Instance{ std::move(other.m_Instance) },
+	m_PhysicalDevice{ std::exchange(other.m_PhysicalDevice, nullptr) },
+	m_CommandPool{ std::exchange(other.m_CommandPool, VK_NULL_HANDLE) },
+	m_Window{ other.m_Window },
+	m_Device{ std::exchange(other.m_Device, VK_NULL_HANDLE) },
+	m_Surface{ std::exchange(other.m_Surface, VK_NULL_HANDLE) },
+	m_GraphicsQueue{ std::exchange(other.m_GraphicsQueue, VK_NULL_HANDLE) },
+	m_PresentQueue{ std::exchange(other.m_PresentQueue, VK_NULL_HANDLE) },
+	m_ComputeQueue{ std::exchange(other.m_ComputeQueue, VK_NULL_HANDLE) },
+	p_Properties{ std::move(other.p_Properties) } {
+}
+
 Device::~Device() {
 	vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
 	vkDestroyDevice(m_Device, nullptr);

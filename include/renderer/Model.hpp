@@ -1,5 +1,6 @@
 #pragma once
 
+#include "renderer/Drawable.hpp"
 #include "renderer/wrapper/Device.hpp"
 #include "renderer/wrapper/Buffer.hpp"
 
@@ -12,7 +13,7 @@
 
 namespace stl {
 
-class Model {
+class Model : public Drawable {
 public:
 	struct Vertex {
 		glm::vec3 position{};
@@ -37,15 +38,15 @@ public:
 
 public:
 	Model(Device& device, const Model::Data& data);
-	~Model();
+	virtual ~Model();
 
 	Model(const Model&) = delete;
 	Model& operator=(const Model&) = delete;
 
 	static std::unique_ptr<Model> createModelFromFile(Device& device, const std::string& filepath);
 
-	void bind(VkCommandBuffer commandBuffer, uint32_t binding = 0);
-	void draw(VkCommandBuffer commandBuffer, uint32_t instanceCount = 1) const;
+	virtual void bind(VkCommandBuffer commandBuffer, uint32_t firstBinding = 0) override;
+	virtual void draw(VkCommandBuffer commandBuffer, uint32_t instanceCount = 1) const override;
 
 private:
 	void createVertexBuffers(const std::vector<Vertex>& vertices);

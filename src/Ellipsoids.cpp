@@ -29,8 +29,8 @@ void Ellipsoids::bind(VkCommandBuffer commandBuffer, uint32_t binding) {
 	vkCmdBindVertexBuffers(commandBuffer, binding, 5, buffers, offsets);
 }
 
-void Ellipsoids::draw(VkCommandBuffer commandBuffer) const {
-	vkCmdDraw(commandBuffer, m_PointCount, 1, 0, 0);
+void Ellipsoids::draw(VkCommandBuffer commandBuffer, uint32_t instanceCount) const {
+	vkCmdDraw(commandBuffer, m_PointCount, instanceCount, 0, 0);
 }
 
 void Ellipsoids::createBuffer(uint32_t elementSize, uint32_t elementCount, void* data, std::unique_ptr<Buffer>& buffer) {
