@@ -1,6 +1,7 @@
 #pragma once
 
 #include "renderer/wrapper/Device.hpp"
+#include "renderer/wrapper/Image.hpp"
 
 #include <vulkan/vulkan.h>
 
@@ -22,7 +23,7 @@ public:
 
 	VkFramebuffer getFramebuffer(int index) const { return m_SwapchainFramebuffers[index]; }
 	VkRenderPass getRenderPass() const { return m_RenderPass; }
-	VkImageView getImageView(int index) const { return m_SwapchainImageViews[index]; }
+	VkImageView getImageView(int index) const { return m_SwapchainImages[index].getImageView(); }
 	size_t imageCount() const { return m_SwapchainImages.size(); }
 	VkFormat getSwapchainImageFormat() const { return m_SwapchainImageFormat; }
 	VkExtent2D getSwapchainExtent() const { return m_SwapchainExtent; }
@@ -63,8 +64,7 @@ private:
 	std::vector<VkImage> m_DepthImages;
 	std::vector<VkDeviceMemory> m_DepthImageMemories;
 	std::vector<VkImageView> m_DepthImageViews;
-	std::vector<VkImage> m_SwapchainImages;
-	std::vector<VkImageView> m_SwapchainImageViews;
+	std::vector<Image> m_SwapchainImages;
 
 	Device& m_Device;
 	VkExtent2D m_WindowExtent;

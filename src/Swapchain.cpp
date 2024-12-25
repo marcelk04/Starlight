@@ -24,12 +24,6 @@ Swapchain::Swapchain(Device& device, std::pair<uint32_t, uint32_t> windowExtent,
 }
 
 Swapchain::~Swapchain() {
-	for (auto imageView : m_SwapchainImageViews) {
-		vkDestroyImageView(m_Device.getDevice(), imageView, nullptr);
-	}
-
-	m_SwapchainImageViews.clear();
-
 	if (m_Swapchain != nullptr) {
 		vkDestroySwapchainKHR(m_Device.getDevice(), m_Swapchain, nullptr);
 		m_Swapchain = nullptr;
@@ -170,32 +164,25 @@ void Swapchain::createSwapchain() {
 		throw std::runtime_error("Failed to create swapchain!");
 	}
 
-	vkGetSwapchainImagesKHR(m_Device.getDevice(), m_Swapchain, &imageCount, nullptr);
-	m_SwapchainImages.resize(imageCount);
-	vkGetSwapchainImagesKHR(m_Device.getDevice(), m_Swapchain, &imageCount, m_SwapchainImages.data());
-
 	m_SwapchainImageFormat = surfaceFormat.format;
 	m_SwapchainExtent = extent;
+
+	uint32_t createdImages;
+	vkGetSwapchainImagesKHR(m_Device.getDevice(), m_Swapchain, &createdImages, nullptr);
+
+	SINFO("Number of swapchain images: ", createdImages, " (requested ", imageCount, ')');
 }
 
 void Swapchain::createImageViews() {
-	m_SwapchainImageViews.resize(m_SwapchainImages.size());
+	uint32_t imageCount;
+	vkGetSwapchainImagesKHR(m_Device.getDevice(), m_Swapchain, &imageCount, nullptr);
+	std::vector<VkImage> images(imageCount);
+	vkGetSwapchainImagesKHR(m_Device.getDevice(), m_Swapchain, &imageCount, images.data());
 
-	for (size_t i = 0; i < m_SwapchainImages.size(); i++) {
-		VkImageViewCreateInfo createInfo = {};
-		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		createInfo.image = m_SwapchainImages[i];
-		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		createInfo.format = m_SwapchainImageFormat;
-		createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		createInfo.subresourceRange.baseMipLevel = 0;
-		createInfo.subresourceRange.levelCount = 1;
-		createInfo.subresourceRange.baseArrayLayer = 0;
-		createInfo.subresourceRange.layerCount = 1;
+	m_SwapchainImages.reserve(imageCount);
 
-		if (vkCreateImageView(m_Device.getDevice(), &createInfo, nullptr, &m_SwapchainImageViews[i]) != VK_SUCCESS) {
-			throw std::runtime_error("Failed to create image view!");
-		}
+	for (VkImage image : images) {
+		m_SwapchainImages.emplace_back(m_Device, image, m_SwapchainImageFormat);
 	}
 }
 
@@ -306,7 +293,7 @@ void Swapchain::createFramebuffers() {
 	m_SwapchainFramebuffers.resize(imageCount());
 
 	for (size_t i = 0; i < imageCount(); i++) {
-		std::array<VkImageView, 2> attachments = { m_SwapchainImageViews[i], m_DepthImageViews[i] };
+		std::array<VkImageView, 2> attachments = { m_SwapchainImages[i].getImageView(), m_DepthImageViews[i] };
 
 		VkExtent2D swapchainExtent = getSwapchainExtent();
 
