@@ -27,6 +27,18 @@ Window::~Window() {
 	glfwTerminate();
 }
 
+Window& Window::operator=(Window&& other) noexcept {
+	Window& copy(other);
+
+	std::swap(m_Width, copy.m_Width);
+	std::swap(m_Height, copy.m_Height);
+	std::swap(m_FramebufferResized, copy.m_FramebufferResized);
+	std::swap(m_Name, copy.m_Name);
+	std::swap(m_Window, copy.m_Window);
+
+	return *this;
+}
+
 bool Window::shouldClose() const {
 	return glfwWindowShouldClose(m_Window);
 }

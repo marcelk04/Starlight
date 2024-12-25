@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include <string>
+#include <utility>
 
 namespace stl {
 
@@ -15,9 +16,9 @@ public:
 	~Window();
 
 	Window& operator=(const Window&) = delete;
-	Window& operator=(Window&& other) = default;
+	Window& operator=(Window&& other) noexcept;
 
-	VkExtent2D getExtent() const { return { static_cast<uint32_t>(m_Width), static_cast<uint32_t>(m_Height) }; }
+	std::pair<uint32_t, uint32_t> getExtent() const { return { static_cast<uint32_t>(m_Width), static_cast<uint32_t>(m_Height) }; }
 	bool shouldClose() const;
 	bool wasWindowResized() const { return m_FramebufferResized; }
 

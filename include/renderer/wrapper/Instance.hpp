@@ -14,7 +14,7 @@ public:
 	~Instance();
 
 	Instance& operator=(const Instance&) = delete;
-	Instance& operator=(Instance&& other) = default;
+	Instance& operator=(Instance&& other) noexcept;
 
 	VkInstance getInstance() const { return m_Instance; }
 

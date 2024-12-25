@@ -5,6 +5,7 @@
 #include <cstring>
 #include <set>
 #include <unordered_set>
+#include <utility>
 
 namespace stl {
 
@@ -34,6 +35,23 @@ Device::~Device() {
 	vkDestroyDevice(m_Device, nullptr);
 
 	vkDestroySurfaceKHR(m_Instance.getInstance(), m_Surface, nullptr);
+}
+
+Device& Device::operator=(Device&& other) noexcept {
+	Device& copy(other);
+
+	std::swap(m_Instance, copy.m_Instance);
+	std::swap(m_PhysicalDevice, copy.m_PhysicalDevice);
+	std::swap(m_CommandPool, copy.m_CommandPool);
+	std::swap(m_Window, copy.m_Window);
+	std::swap(m_Device, copy.m_Device);
+	std::swap(m_Surface, copy.m_Surface);
+	std::swap(m_GraphicsQueue, copy.m_GraphicsQueue);
+	std::swap(m_PresentQueue, copy.m_PresentQueue);
+	std::swap(m_ComputeQueue, copy.m_ComputeQueue);
+	std::swap(p_Properties, copy.p_Properties);
+
+	return *this;
 }
 
 SwapchainSupportDetails Device::getSwapchainSupport() {

@@ -11,13 +11,13 @@
 
 namespace stl {
 
-Swapchain::Swapchain(Device& device, VkExtent2D windowExtent)
-	: m_Device{ device }, m_WindowExtent{ windowExtent } {
+Swapchain::Swapchain(Device& device, std::pair<uint32_t, uint32_t> windowExtent)
+	: m_Device{ device }, m_WindowExtent{ windowExtent.first, windowExtent.second } {
 	init();
 }
 
-Swapchain::Swapchain(Device& device, VkExtent2D windowExtent, std::shared_ptr<Swapchain> previousSwapchain)
-	: m_Device{ device }, m_WindowExtent{ windowExtent }, m_OldSwapchain{ previousSwapchain } {
+Swapchain::Swapchain(Device& device, std::pair<uint32_t, uint32_t> windowExtent, std::shared_ptr<Swapchain> previousSwapchain)
+	: m_Device{ device }, m_WindowExtent{ windowExtent.first, windowExtent.second }, m_OldSwapchain{ previousSwapchain } {
 	init();
 
 	m_OldSwapchain = nullptr;

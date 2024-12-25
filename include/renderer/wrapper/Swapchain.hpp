@@ -7,13 +7,14 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <utility>
 
 namespace stl {
 
 class Swapchain {
 public:
-	Swapchain(Device& device, VkExtent2D windowExtent);
-	Swapchain(Device& device, VkExtent2D windowExtent, std::shared_ptr<Swapchain> previousSwapchain);
+	Swapchain(Device& device, std::pair<uint32_t, uint32_t> windowExtent);
+	Swapchain(Device& device, std::pair<uint32_t, uint32_t> windowExtent, std::shared_ptr<Swapchain> previousSwapchain);
 	~Swapchain();
 
 	Swapchain(const Swapchain&) = delete;

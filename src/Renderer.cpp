@@ -140,9 +140,9 @@ void Renderer::freeCommandBuffers() {
 }
 
 void Renderer::recreateSwapchain() {
-	VkExtent2D extent = m_Window.getExtent();
+	std::pair<uint32_t, uint32_t> extent = m_Window.getExtent();
 
-	while (extent.width == 0 || extent.height == 0) {
+	while (extent.first == 0 || extent.second == 0) {
 		extent = m_Window.getExtent();
 		glfwWaitEvents();
 	}

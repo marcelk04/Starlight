@@ -79,6 +79,16 @@ Instance::~Instance() {
 	vkDestroyInstance(m_Instance, nullptr);
 }
 
+Instance& Instance::operator=(Instance&& other) noexcept {
+	Instance& copy(other);
+
+	std::swap(m_Instance, copy.m_Instance);
+	std::swap(m_DebugMessenger, copy.m_DebugMessenger);
+	std::swap(m_EnableValidationLayers, copy.m_EnableValidationLayers);
+
+	return *this;
+}
+
 /*
  * Function used internally to create a Vulkan instance.
  * If enabled and present, validation layers are also added.

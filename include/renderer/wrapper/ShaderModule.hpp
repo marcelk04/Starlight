@@ -24,7 +24,7 @@ public:
     ~ShaderModule();
 
     ShaderModule& operator=(const ShaderModule&) = delete;
-    ShaderModule& operator=(ShaderModule&&) = default;
+    ShaderModule& operator=(ShaderModule&& other) noexcept;
 
     VkShaderModule getModule() const { return m_Module; }
     Type getType() const { return m_Type; }

@@ -21,6 +21,17 @@ ShaderModule::~ShaderModule() {
     vkDestroyShaderModule(m_Device.getDevice(), m_Module, nullptr);
 }
 
+ShaderModule& ShaderModule::operator=(ShaderModule&& other) noexcept {
+    ShaderModule& copy(other);
+
+    std::swap(m_Device, copy.m_Device);
+    std::swap(m_Path, copy.m_Path);
+    std::swap(m_Module, copy.m_Module);
+    std::swap(m_Type, copy.m_Type);
+
+    return *this;
+}
+
 VkPipelineShaderStageCreateInfo ShaderModule::getStageInfo() const {
     VkPipelineShaderStageCreateInfo info{};
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;

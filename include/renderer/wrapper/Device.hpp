@@ -17,7 +17,7 @@ public:
 	~Device();
 
 	Device& operator=(const Device&) = delete;
-	Device& operator=(Device&& other) = default;
+	Device& operator=(Device&& other) noexcept;
 
 	VkCommandPool getCommandPool() const { return m_CommandPool; }
 	VkDevice getDevice() const { return m_Device; }
