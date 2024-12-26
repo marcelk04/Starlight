@@ -19,8 +19,8 @@
 #define debugBreak() raise(SIGTRAP)
 #endif
 
-#define SASSERT(expr) if (!(expr)) { SFATAL("Assertion failed: '", #expr, "' (file ", __FILE__, ", line ", __LINE__, ')'); debugBreak(); }
-#define SASSERT_MSG(expr, ...) if (!(expr)) { SFATAL("Assertion failed: '", #expr, "' (file ", __FILE__, ", line ", __LINE__, ')'); SFATAL(__VA_ARGS__); debugBreak(); }
+#define SASSERT(expr) if (!(expr)) { SFATAL("Assertion failed: '", #expr, "' in file ", __FILE__, " on line ", __LINE__); debugBreak(); }
+#define SASSERT_MSG(expr, ...) if (!(expr)) { SFATAL("Assertion failed: '", #expr, "' in file ", __FILE__, " on line ", __LINE__); SFATAL(__VA_ARGS__); debugBreak(); }
 
 #else
 

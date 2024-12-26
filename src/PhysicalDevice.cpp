@@ -10,9 +10,7 @@
 namespace stl {
 
 PhysicalDevice::PhysicalDevice(Instance& instance, VkSurfaceKHR surface, VkPhysicalDevice physicalDevice)
-	: m_Instance{ instance }, m_Surface{ surface }, m_PhysicalDevice {
-	physicalDevice
-} {
+	: m_Instance{ instance }, m_Surface{ surface }, m_PhysicalDevice{ physicalDevice } {
 	queryQueueFamilies();
 	vkGetPhysicalDeviceProperties(m_PhysicalDevice, &p_Properties);
 }

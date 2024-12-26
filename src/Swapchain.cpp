@@ -29,12 +29,6 @@ Swapchain::~Swapchain() {
 		m_Swapchain = nullptr;
 	}
 
-	for (size_t i = 0; i < m_DepthImages.size(); i++) {
-		vkDestroyImageView(m_Device.getDevice(), m_DepthImageViews[i], nullptr);
-		vkDestroyImage(m_Device.getDevice(), m_DepthImages[i], nullptr);
-		vkFreeMemory(m_Device.getDevice(), m_DepthImageMemories[i], nullptr);
-	}
-
 	for (auto framebuffer : m_SwapchainFramebuffers) {
 		vkDestroyFramebuffer(m_Device.getDevice(), framebuffer, nullptr);
 	}
@@ -170,7 +164,9 @@ void Swapchain::createSwapchain() {
 	uint32_t createdImages;
 	vkGetSwapchainImagesKHR(m_Device.getDevice(), m_Swapchain, &createdImages, nullptr);
 
-	SINFO("Number of swapchain images: ", createdImages, " (requested ", imageCount, ')');
+	if (m_OldSwapchain == nullptr) {
+		SINFO("Number of swapchain images: ", createdImages, " (requested ", imageCount, ')');
+	}
 }
 
 void Swapchain::createImageViews() {
@@ -182,7 +178,12 @@ void Swapchain::createImageViews() {
 	m_SwapchainImages.reserve(imageCount);
 
 	for (VkImage image : images) {
-		m_SwapchainImages.emplace_back(m_Device, image, m_SwapchainImageFormat);
+		Image::Spec imageSpec{
+			.format = m_SwapchainImageFormat,
+			.allocateMemory = false
+		};
+
+		m_SwapchainImages.emplace_back(m_Device, imageSpec, image);
 	}
 }
 
@@ -190,43 +191,17 @@ void Swapchain::createDepthResources() {
 	m_SwapchainDepthFormat = findDepthFormat();
 	VkExtent2D swapchainExtent = getSwapchainExtent();
 
-	m_DepthImages.resize(imageCount());
-	m_DepthImageMemories.resize(imageCount());
-	m_DepthImageViews.resize(imageCount());
+	m_DepthImages.reserve(imageCount());
 
 	for (size_t i = 0; i < imageCount(); i++) {
-		VkImageCreateInfo imageInfo = {};
-		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageInfo.imageType = VK_IMAGE_TYPE_2D;
-		imageInfo.extent.width = swapchainExtent.width;
-		imageInfo.extent.height = swapchainExtent.height;
-		imageInfo.extent.depth = 1;
-		imageInfo.mipLevels = 1;
-		imageInfo.arrayLayers = 1;
-		imageInfo.format = m_SwapchainDepthFormat;
-		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		imageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		imageInfo.flags = 0;
+		Image::Spec imageSpec{
+			.format = m_SwapchainDepthFormat,
+			.extent = { swapchainExtent.width, swapchainExtent.height, 1 },
+			.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+			.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT
+		};
 
-		m_Device.createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_DepthImages[i], m_DepthImageMemories[i]);
-
-		VkImageViewCreateInfo viewInfo = {};
-		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		viewInfo.image = m_DepthImages[i];
-		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		viewInfo.format = m_SwapchainDepthFormat;
-		viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-		viewInfo.subresourceRange.baseMipLevel = 0;
-		viewInfo.subresourceRange.levelCount = 1;
-		viewInfo.subresourceRange.baseArrayLayer = 0;
-		viewInfo.subresourceRange.layerCount = 1;
-
-		if (vkCreateImageView(m_Device.getDevice(), &viewInfo, nullptr, &m_DepthImageViews[i]) != VK_SUCCESS) {
-			throw std::runtime_error("Failed to create texture image view!");
-		}
+		m_DepthImages.emplace_back(m_Device, imageSpec);
 	}
 }
 
@@ -293,7 +268,7 @@ void Swapchain::createFramebuffers() {
 	m_SwapchainFramebuffers.resize(imageCount());
 
 	for (size_t i = 0; i < imageCount(); i++) {
-		std::array<VkImageView, 2> attachments = { m_SwapchainImages[i].getImageView(), m_DepthImageViews[i] };
+		std::array<VkImageView, 2> attachments = { m_SwapchainImages[i].getImageView(), m_DepthImages[i].getImageView() };
 
 		VkExtent2D swapchainExtent = getSwapchainExtent();
 
@@ -347,7 +322,9 @@ VkSurfaceFormatKHR Swapchain::chooseSwapSurfaceFormat(const std::vector<VkSurfac
 VkPresentModeKHR Swapchain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const {
 	for (const auto& availablePresentMode : availablePresentModes) {
 		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-			SINFO("Present mode: Mailbox");
+			if (m_OldSwapchain == nullptr) {
+				SINFO("Present mode: Mailbox");
+			}
 
 			return availablePresentMode;
 		}
@@ -362,8 +339,10 @@ VkPresentModeKHR Swapchain::chooseSwapPresentMode(const std::vector<VkPresentMod
 		}
 	}
 	*/
-
-	SINFO("Present mode: V-Sync");
+	
+	if (m_OldSwapchain == nullptr) {
+		SINFO("Present mode: V-Sync");
+	}
 
 	return VK_PRESENT_MODE_FIFO_KHR;
 }

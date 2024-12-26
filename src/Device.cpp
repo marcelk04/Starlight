@@ -161,28 +161,6 @@ void Device::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, u
 	endSingleTimeCommands(commandBuffer);
 }
 
-void Device::createImageWithInfo(const VkImageCreateInfo &imageInfo, VkMemoryPropertyFlags properties, VkImage &image, VkDeviceMemory &imageMemory) const {
-	if (vkCreateImage(m_Device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to create image!");
-	}
-
-	VkMemoryRequirements memRequirements;
-	vkGetImageMemoryRequirements(m_Device, image, &memRequirements);
-
-	VkMemoryAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
-
-	if (vkAllocateMemory(m_Device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to allocate image memory!");
-	}
-
-	if (vkBindImageMemory(m_Device, image, imageMemory, 0) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to bind image memory!");
-	}
-}
-
 void Device::createSurface() {
 	m_Window.createWindowSurface(m_Instance.getInstance(), &m_Surface);
 }
