@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
 
     if (argc < 2) {
         SWARN("No path to gaussians passed. Loading default model.");
-        modelPath = "assets/point_clouds/17_12_resolution_4x.ply";
+        modelPath = "assets/point_clouds/01_10_03_dyn_masks.ply";
     } else {
         modelPath = argv[1];
     }
